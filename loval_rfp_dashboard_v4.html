@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'OVAL · Evaluación de Proveedores · RFP 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1c2330;
+    --border:    #2a3441;
+    --border2:   #374151;
+    --intec:     #3b82f6;
+    --intec-dim: #1d4ed8;
+    --intec-bg:  rgba(59,130,246,0.08);
+    --exp:       #10b981;
+    --exp-dim:   #065f46;
+    --exp-bg:    rgba(16,185,129,0.08);
+    --warn:      #f59e0b;
+    --warn-bg:   rgba(245,158,11,0.10);
+    --muted:     #6b7280;
+    --text:      #e5e7eb;
+    --text2:     #9ca3af;
+    --text3:     #6b7280;
+    --radius:    12px;
+    --radius-sm: 8px;
+    --tie:       #8b5cf6;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── LOGIN ───────────────────────────────── */
+  #login-screen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+  }
+  #login-screen.hidden { display: none; }
+  .login-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 30%, rgba(59,130,246,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 70%, rgba(16,185,129,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .login-box {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 52px;
+    width: 420px;
+    max-width: 92vw;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .login-logo { font-family: 'DM Serif Display', serif; font-size: 28px; letter-spacing: 0.06em; color: #fff; text-align: center; margin-bottom: 4px; }
+  .login-subtitle { font-size: 12px; color: var(--text3); text-align: center; margin-bottom: 36px; letter-spacing: 0.04em; }
+  .login-field { margin-bottom: 16px; }
+  .login-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; display: block; }
+  .login-input { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 11px 14px; outline: none; transition: border-color .2s; }
+  .login-input:focus { border-color: var(--intec); }
+  .login-btn { width: 100%; background: var(--intec); border: none; border-radius: var(--radius-sm); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 12px; cursor: pointer; margin-top: 8px; transition: background .2s, transform .1s; letter-spacing: 0.03em; }
+  .login-btn:hover { background: var(--intec-dim); }
+  .login-btn:active { transform: scale(0.99); }
+  .login-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #fca5a5; font-size: 12.5px; padding: 10px 14px; margin-top: 12px; display: none; }
+  .login-error.show { display: block; }
+  .login-footer { margin-top: 28px; font-size: 11px; color: var(--text3); text-align: center; line-height: 1.7; }
+
+  /* ── COVER ───────────────────────────────── */
+  #cover-page { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 60px 40px; overflow: hidden; }
+  #cover-page.hidden { display: none; }
+  .cover-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 15% 20%, rgba(59,130,246,0.09) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 45% at 85% 75%, rgba(16,185,129,0.07) 0%, transparent 55%),
+      linear-gradient(180deg, #0d1117 0%, #101520 100%);
+    pointer-events: none;
+  }
+  .cover-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .cover-content { position: relative; max-width: 780px; width: 100%; text-align: center; }
+  .cover-tag { display: inline-flex; align-items: center; gap: 8px; background: var(--intec-bg); border: 1px solid rgba(59,130,246,0.25); border-radius: 20px; padding: 5px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--intec); margin-bottom: 28px; }
+  .cover-logo { font-family: 'DM Serif Display', serif; font-size: 72px; letter-spacing: 0.08em; color: #fff; line-height: 1; margin-bottom: 10px; }
+  .cover-template { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 16px; }
+  .cover-title { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--text); line-height: 1.3; margin-bottom: 22px; font-style: italic; }
+  .cover-subtitle { font-size: 14px; color: var(--text2); line-height: 1.75; max-width: 620px; margin: 0 auto 36px; }
+  .cover-vs { display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 44px; }
+  .cover-prov { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 32px; font-size: 18px; font-weight: 700; letter-spacing: 0.08em; }
+  .cover-prov.intec { border-top: 3px solid var(--intec); color: var(--intec); }
+  .cover-prov.exp   { border-top: 3px solid var(--exp); color: var(--exp); }
+  .cover-vs-sep { font-size: 14px; font-weight: 700; color: var(--text3); letter-spacing: 0.12em; }
+  .cover-stats { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 44px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; max-width: 560px; margin-left: auto; margin-right: auto; }
+  .cover-stat { flex: 1; padding: 20px 24px; border-right: 1px solid var(--border); }
+  .cover-stat:last-child { border-right: none; }
+  .cover-stat-val { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; line-height: 1; margin-bottom: 4px; }
+  .cover-stat-label { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.04em; }
+  .cover-stat.warn .cover-stat-val { color: var(--warn); }
+  .cover-pending { display: inline-flex; align-items: center; gap: 8px; background: var(--warn-bg); border: 1px solid rgba(245,158,11,0.25); border-radius: 20px; padding: 6px 18px; font-size: 12px; font-weight: 600; color: var(--warn); margin-bottom: 44px; letter-spacing: 0.03em; }
+  .cover-meta { font-size: 12.5px; color: var(--text3); margin-bottom: 40px; line-height: 1.8; }
+  .cover-meta strong { color: var(--text2); }
+  .cover-cta { display: inline-flex; align-items: center; gap: 10px; background: var(--intec); border: none; border-radius: var(--radius-sm); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 14px 32px; cursor: pointer; letter-spacing: 0.04em; transition: background .2s, transform .15s; }
+  .cover-cta:hover { background: var(--intec-dim); transform: translateY(-1px); }
+
+  /* ── DASHBOARD ──────────────────────────── */
+  #dashboard { display: none; }
+  #dashboard.visible { display: block; }
+
+  /* ── HEADER ────────────────────────────── */
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+  .header-brand { display: flex; align-items: center; gap: 14px; }
+  .header-logo { font-family: 'DM Serif Display', serif; font-size: 18px; letter-spacing: 0.05em; color: #fff; cursor: pointer; }
+  .header-sep { width: 1px; height: 20px; background: var(--border2); }
+  .header-title { color: var(--text2); font-size: 13px; font-weight: 400; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .badge-warn { background: var(--warn-bg); border: 1px solid rgba(245,158,11,0.3); color: var(--warn); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.04em; display: flex; align-items: center; gap: 5px; }
+  .header-date { color: var(--text3); font-size: 12px; }
+  .logout-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 6px; color: var(--text3); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 12px; cursor: pointer; transition: all .15s; }
+  .logout-btn:hover { border-color: #ef4444; color: #fca5a5; }
+
+  /* ── NAV ────────────────────────────────── */
+  .nav-tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; gap: 0; }
+  .nav-tab { padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--text3); cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; user-select: none; letter-spacing: 0.02em; }
+  .nav-tab:hover { color: var(--text2); }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--intec); }
+
+  /* ── MAIN ───────────────────────────────── */
+  .main { max-width: 1200px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* ── ALERT BANNER ──────────────────────── */
+  .alert-banner { background: var(--warn-bg); border: 1px solid rgba(245,158,11,0.25); border-radius: var(--radius); padding: 14px 20px; display: flex; align-items: flex-start; gap: 12px; margin-bottom: 32px; }
+  .alert-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .alert-body { flex: 1; }
+  .alert-title { font-weight: 600; color: var(--warn); font-size: 13px; margin-bottom: 2px; }
+  .alert-text { color: var(--text2); font-size: 12.5px; line-height: 1.5; }
+
+  /* ── SECTION HEADER ─────────────────────── */
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; margin-bottom: 6px; }
+  .section-sub { color: var(--text2); font-size: 13.5px; margin-bottom: 32px; }
+
+  /* ── GRID UTILITIES ─────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+  /* ── CARDS ───────────────────────────────── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+
+  /* ── SCORE CARDS ─────────────────────────── */
+  .score-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .score-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 28px 22px; position: relative; overflow: hidden; }
+  .score-card.winner { border-color: rgba(59,130,246,0.4); }
+  .score-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .score-card.intec::before { background: var(--intec); }
+  .score-card.exp::before { background: var(--exp); }
+  .score-provider { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .score-card.intec .score-provider { color: var(--intec); }
+  .score-card.exp .score-provider { color: var(--exp); }
+  .score-number { font-family: 'DM Serif Display', serif; font-size: 52px; line-height: 1; color: #fff; margin-bottom: 2px; }
+  .score-denom { font-size: 18px; color: var(--text3); font-weight: 300; }
+  .score-label { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+  .score-bar-wrap { background: var(--bg); border-radius: 4px; height: 6px; overflow: hidden; }
+  .score-bar { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+  .score-card.intec .score-bar { background: var(--intec); }
+  .score-card.exp .score-bar { background: var(--exp); }
+  .score-pct { font-size: 12px; color: var(--text2); margin-top: 6px; }
+  .winner-badge { position: absolute; top: 18px; right: 18px; background: var(--intec-bg); border: 1px solid rgba(59,130,246,0.3); color: var(--intec); font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; }
+
+  /* ── DIFF + PENDING STRIP ───────────────── */
+  .meta-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .meta-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; display: flex; align-items: center; gap: 14px; }
+  .meta-icon { font-size: 22px; }
+  .meta-val { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; line-height: 1; }
+  .meta-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* ── CHART CARDS ─────────────────────────── */
+  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .chart-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 18px; }
+
+  /* ── DIMENSION CHART ─────────────────────── */
+  .dim-chart-wrap { display: flex; flex-direction: column; gap: 16px; }
+  .dim-chart-row {}
+  .dim-chart-name { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 6px; }
+  .dim-chart-bars { display: flex; flex-direction: column; gap: 4px; }
+  .dim-chart-bar-row { display: flex; align-items: center; gap: 8px; }
+  .dim-chart-bar-label { font-size: 10px; font-weight: 600; width: 60px; flex-shrink: 0; }
+  .dim-chart-bar-label.intec { color: var(--intec); }
+  .dim-chart-bar-label.exp   { color: var(--exp); }
+  .dim-chart-track { flex: 1; background: var(--bg); height: 18px; border-radius: 4px; overflow: hidden; }
+  .dim-chart-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 10px; font-weight: 700; color: #fff; }
+  .dim-chart-fill.intec { background: var(--intec); }
+  .dim-chart-fill.exp   { background: var(--exp); }
+  .dim-chart-max { font-size: 10px; color: var(--text3); margin-top: 3px; }
+
+  /* ── HORIZONTAL BAR ─────────────────────── */
+  .hbar-wrap { display: flex; flex-direction: column; gap: 12px; }
+  .hbar-row { display: flex; align-items: center; gap: 10px; }
+  .hbar-label { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; text-align: right; font-weight: 600; }
+  .hbar-track { flex: 1; background: var(--bg); height: 28px; border-radius: 6px; overflow: hidden; position: relative; }
+  .hbar-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 700; color: #fff; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+  .hbar-fill.intec { background: linear-gradient(90deg, var(--intec-dim), var(--intec)); }
+  .hbar-fill.exp   { background: linear-gradient(90deg, var(--exp-dim), var(--exp)); }
+
+  /* ── CONCLUSION ─────────────────────────── */
+  .conclusion { background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, rgba(16,185,129,0.03) 100%); border: 1px solid rgba(59,130,246,0.2); border-radius: var(--radius); padding: 24px 28px; margin-bottom: 32px; }
+  .conclusion-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--intec); margin-bottom: 8px; }
+  .conclusion-text { color: var(--text); font-size: 14px; line-height: 1.7; }
+  .conclusion-text strong { color: #fff; }
+
+  /* ── FILTERS CARD ────────────────────────── */
+  .filters-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .filters-card-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .filters-card-title::before {
+    content: '';
+    display: inline-block;
+    width: 3px; height: 12px;
+    background: var(--intec);
+    border-radius: 2px;
+  }
+  .filters-bar { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; }
+  .filter-label { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.04em; }
+  .filter-select, .filter-input {
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color .2s;
+    min-width: 150px;
+  }
+  .filter-select:focus, .filter-input:focus { border-color: var(--intec); }
+  .filter-input { min-width: 200px; }
+  option { background: #1c2330; }
+
+  /* ── S2 CHARTS ROW ──────────────────────── */
+  .s2-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .s2-chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+  .s2-chart-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 14px; }
+
+  /* Drivers chart */
+  .drivers-chart { display: flex; flex-direction: column; gap: 8px; }
+  .dc-row { display: flex; align-items: center; gap: 10px; }
+  .dc-rank { font-size: 10px; font-weight: 700; color: var(--text3); width: 20px; flex-shrink: 0; }
+  .dc-name { font-size: 12px; color: var(--text2); width: 180px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dc-track { flex: 1; background: var(--bg); height: 16px; border-radius: 4px; overflow: hidden; }
+  .dc-fill { height: 100%; border-radius: 4px; }
+  .dc-fill.intec { background: var(--intec); }
+  .dc-fill.exp   { background: var(--exp); }
+  .dc-delta { font-size: 12px; font-weight: 700; width: 52px; flex-shrink: 0; text-align: right; }
+  .dc-delta.intec { color: var(--intec); }
+  .dc-delta.exp   { color: var(--exp); }
+
+  /* ── SORT BAR ───────────────────────────── */
+  .sort-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .sort-label { font-size: 12px; color: var(--text3); }
+  .sort-btn { background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; color: var(--text2); font-size: 12px; font-family: 'DM Sans', sans-serif; padding: 5px 12px; cursor: pointer; transition: all .15s; }
+  .sort-btn:hover { border-color: var(--intec); color: var(--intec); }
+  .sort-btn.active { background: var(--intec-bg); border-color: var(--intec); color: var(--intec); }
+
+  /* ── TABLE ───────────────────────────────── */
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .table-count { font-size: 12px; color: var(--text3); padding: 12px 18px; border-bottom: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { background: var(--surface2); padding: 11px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text3); text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  thead th:first-child { padding-left: 18px; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 11px 14px; font-size: 13px; color: var(--text2); vertical-align: middle; }
+  tbody td:first-child { padding-left: 18px; color: var(--text); }
+  .td-dim { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .td-dim.Funcional { color: #f97316; }
+  .td-dim.Técnico { color: #a78bfa; }
+  .td-dim.Proveedor { color: #67e8f9; }
+  .td-cat { color: var(--text3); font-size: 12px; }
+  .td-peso { font-variant-numeric: tabular-nums; }
+  .td-peso strong { color: #fff; font-weight: 600; }
+  .pts-chip { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 2px 8px; min-width: 36px; }
+  .pts-100 { background: rgba(16,185,129,0.15); color: #34d399; }
+  .pts-75  { background: rgba(59,130,246,0.12); color: #93c5fd; }
+  .pts-50  { background: rgba(245,158,11,0.12); color: #fcd34d; }
+  .pts-40  { background: rgba(239,68,68,0.12);  color: #fca5a5; }
+  .pts-0   { background: rgba(107,114,128,0.15); color: #6b7280; }
+  .td-final { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 500; }
+  .td-diff-pos { color: var(--intec); font-weight: 600; }
+  .td-diff-neg { color: var(--exp); font-weight: 600; }
+  .td-diff-zero { color: var(--text3); }
+  .winner-chip { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; }
+  .winner-chip.INTEC { background: var(--intec-bg); color: var(--intec); border: 1px solid rgba(59,130,246,0.25); }
+  .winner-chip.EXPERTICE { background: var(--exp-bg); color: var(--exp); border: 1px solid rgba(16,185,129,0.25); }
+  .winner-chip.Empate { background: rgba(139,92,246,0.1); color: var(--tie); border: 1px solid rgba(139,92,246,0.25); }
+
+  /* ── INSIGHTS ────────────────────────────── */
+  .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .insight-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .insight-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .insight-dot.intec { background: var(--intec); }
+  .insight-dot.exp { background: var(--exp); }
+  .insight-dot.neutral { background: var(--text3); }
+  .insight-dot.warn { background: var(--warn); }
+  .insight-htitle { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text2); }
+  .insight-big { font-family: 'DM Serif Display', serif; font-size: 36px; color: #fff; line-height: 1; margin-bottom: 4px; }
+  .insight-sub { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+
+  .stat-list { display: flex; flex-direction: column; gap: 10px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .stat-key { color: var(--text2); }
+  .stat-val { font-weight: 600; color: #fff; }
+
+  .conc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .conc-label { font-size: 12px; color: var(--text2); width: 160px; flex-shrink: 0; }
+  .conc-track { flex: 1; background: var(--bg); height: 6px; border-radius: 3px; overflow: hidden; }
+  .conc-fill-intec { height: 100%; background: var(--intec); border-radius: 3px; }
+  .conc-fill-exp { height: 100%; background: var(--exp); border-radius: 3px; }
+  .conc-pct { font-size: 12px; color: var(--text2); width: 70px; text-align: right; flex-shrink: 0; }
+
+  .risk-list { display: flex; flex-direction: column; gap: 8px; }
+  .risk-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; }
+  .risk-item.high { border-left: 3px solid #ef4444; }
+  .risk-item.med  { border-left: 3px solid var(--warn); }
+  .risk-item.low  { border-left: 3px solid var(--text3); }
+  .risk-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+  .risk-name { font-size: 13px; color: var(--text); font-weight: 500; }
+  .risk-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .risk-badge.high { color: #ef4444; }
+  .risk-badge.med  { color: var(--warn); }
+  .risk-badge.low  { color: var(--text3); }
+  .risk-sub { font-size: 12px; color: var(--text3); }
+
+  .full-width-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin-bottom: 16px; }
+  .full-width-card .card-title { margin-bottom: 14px; }
+
+  /* ── MATRIZ DE EVALUACIÓN ───────────────── */
+  .matrix-filters-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .matrix-filters-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text3);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .matrix-filters-title::before {
+    content: ''; display: inline-block; width: 3px; height: 12px;
+    background: var(--intec); border-radius: 2px;
+  }
+  .matrix-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .matrix-count {
+    font-size: 12px; color: var(--text3);
+    padding: 12px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .matrix-legend {
+    display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text3);
+  }
+  .ml-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+  .matrix-table { width: 100%; border-collapse: collapse; }
+  .matrix-table thead th {
+    background: var(--surface2); padding: 10px 12px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--text3);
+    text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  .matrix-table thead th:first-child { padding-left: 16px; }
+  .matrix-table tbody tr.mrow {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background .15s;
+  }
+  .matrix-table tbody tr.mrow:last-child { border-bottom: none; }
+  .matrix-table tbody tr.mrow:hover { background: rgba(59,130,246,0.04); }
+  .matrix-table tbody tr.mrow.expanded { background: rgba(59,130,246,0.06); }
+  .matrix-table tbody td {
+    padding: 10px 12px; font-size: 12.5px; color: var(--text2); vertical-align: middle;
+  }
+  .matrix-table tbody td:first-child { padding-left: 16px; }
+  .td-item-name { color: var(--text); font-size: 13px; max-width: 200px; line-height: 1.35; }
+  .td-item-name .item-cat { font-size: 10px; color: var(--text3); margin-top: 2px; letter-spacing: 0.03em; }
+  .expand-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; border-radius: 4px;
+    background: var(--surface2); color: var(--text3);
+    font-size: 10px; transition: all .2s; flex-shrink: 0; margin-right: 8px;
+  }
+  .mrow.expanded .expand-icon { background: var(--intec-bg); color: var(--intec); transform: rotate(90deg); }
+  .detail-row td {
+    padding: 0 !important; background: #0f1520;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row.hidden { display: none; }
+  .detail-inner {
+    padding: 16px 20px 20px 44px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  }
+  .just-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .just-card.intec-j { border-left: 3px solid var(--intec); }
+  .just-card.exp-j   { border-left: 3px solid var(--exp); }
+  .just-header {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .just-header.intec { color: var(--intec); }
+  .just-header.exp   { color: var(--exp); }
+  .just-text { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .pts-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 4px; margin-bottom: 8px;
+  }
+  .pts-badge.p100 { background: rgba(16,185,129,0.15); color: #34d399; }
+  .pts-badge.p75  { background: rgba(59,130,246,0.12); color: #93c5fd; }
+  .pts-badge.p50  { background: rgba(245,158,11,0.12); color: #fcd34d; }
+  .pts-badge.p40  { background: rgba(239,68,68,0.12);  color: #fca5a5; }
+  .pts-badge.p0   { background: rgba(107,114,128,0.15); color: #6b7280; }
+  .just-snippet {
+    font-size: 11.5px; color: var(--text3); line-height: 1.5;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .diff-chip {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .diff-chip.pos { background: rgba(59,130,246,0.1); color: var(--intec); }
+  .diff-chip.neg { background: rgba(16,185,129,0.1); color: var(--exp); }
+  .diff-chip.zer { background: rgba(139,92,246,0.1); color: var(--tie); }
+  .winner-m.INTEC     { color: var(--intec); font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .winner-m.EXPERTICE { color: var(--exp);   font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .winner-m.Empate    { color: var(--tie);   font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+  .score-inline {
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .si-pts { font-size: 13px; font-weight: 700; }
+  .si-pts.intec { color: var(--intec); }
+  .si-pts.exp   { color: var(--exp); }
+  .si-final { font-size: 10px; color: var(--text3); }
+  .pend-row-m td { background: rgba(245,158,11,0.04) !important; }
+  .pend-row-m:hover td { background: rgba(245,158,11,0.07) !important; }
+
+  /* ── RESPONSIVE matrix ──────────────────── */
+  @media (max-width: 768px) {
+    .detail-inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .main { padding: 20px 16px 60px; }
+    .header { padding: 0 16px; }
+    .nav-tabs { padding: 0 16px; overflow-x: auto; }
+    .score-hero, .meta-strip, .insights-grid, .s2-charts, .grid-2 { grid-template-columns: 1fr; }
+    .filters-bar { flex-direction: column; }
+    .filter-select, .filter-input { min-width: unset; width: 100%; }
+    .cover-logo { font-size: 48px; }
+    .cover-stats { flex-direction: column; }
+    .cover-stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .cover-stat:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-bg"></div>
+  <div class="login-box">
+    <div class="login-logo">L'OVAL</div>
+    <div class="login-subtitle">Evaluación de Proveedores · RFP 2026</div>
+    <div class="login-field">
+      <label class="login-label" for="login-user">Usuario</label>
+      <input type="text" id="login-user" class="login-input" placeholder="Usuario" autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label class="login-label" for="login-pass">Contraseña</label>
+      <input type="password" id="login-pass" class="login-input" placeholder="••••••••••••" autocomplete="current-password">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Ingresar al dashboard →</button>
+    <div class="login-error" id="login-error">Credenciales incorrectas. Verificá usuario y contraseña.</div>
+    <div class="login-footer">
+      Universidad de Buenos Aires · Grupo 5<br>
+      Tesis: Transformación Digital B2B
+    </div>
+  </div>
+</div>
+
+<!-- COVER -->
+<div id="cover-page" class="hidden">
+  <div class="cover-bg"></div>
+  <div class="cover-grid"></div>
+  <div class="cover-content">
+    <div class="cover-tag">📋 Template 10 · RFP Ponderada</div>
+    <div class="cover-logo">L'OVAL</div>
+    <div class="cover-template">Comparación de Cumplimiento y Evaluación Económica</div>
+    <div class="cover-title">Evaluación Comparativa de Proveedores Tecnológicos</div>
+    <p class="cover-subtitle">
+      Evaluación comparativa de proveedores tecnológicos para la integración de Tiendanube B2B, Plataforma ERP y operador logístico LESET mediante metodología RFP ponderada.
+    </p>
+    <div class="cover-vs">
+      <div class="cover-prov intec">INTEC</div>
+      <div class="cover-vs-sep">VS</div>
+      <div class="cover-prov exp">EXPERTICE</div>
+    </div>
+    <div class="cover-stats" style="margin-bottom:20px">
+      <div class="cover-stat">
+        <div class="cover-stat-val">26</div>
+        <div class="cover-stat-label">Criterios evaluados</div>
+      </div>
+      <div class="cover-stat">
+        <div class="cover-stat-val">4</div>
+        <div class="cover-stat-label">Dimensiones</div>
+      </div>
+      <div class="cover-stat warn">
+        <div class="cover-stat-val">30%</div>
+        <div class="cover-stat-label">Peso pendiente</div>
+      </div>
+    </div>
+    <div class="cover-pending">⚠ Económico pendiente de validación</div>
+    <div class="cover-meta">
+      <strong>Grupo 5</strong> · Universidad de Buenos Aires · Año <strong>2026</strong>
+    </div>
+    <button class="cover-cta" onclick="goToDashboard()">Ver Dashboard ↓</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo" onclick="backToCover()" title="Volver a portada">L'OVAL</div>
+    <div class="header-sep"></div>
+    <div class="header-title">Evaluación de Proveedores · Transformación Digital B2B</div>
+  </div>
+  <div class="header-right">
+    <div class="badge-warn">⚠ Económico pendiente</div>
+    <div class="header-date">Mayo 2026</div>
+    <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+  </div>
+</header>
+
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="showSection('s1', this)">Resumen ejecutivo</div>
+  <div class="nav-tab" onclick="showSection('s2', this)">Análisis por ítem</div>
+  <div class="nav-tab" onclick="showSection('s4', this)">Matriz de evaluación</div>
+  <div class="nav-tab" onclick="showSection('s3', this)">Insights & riesgos</div>
+</nav>
+
+<main class="main">
+
+<!-- ══════════════════════════════════════════ -->
+<!--  S1 — RESUMEN EJECUTIVO                   -->
+<!-- ══════════════════════════════════════════ -->
+<section id="s1" class="section active">
+
+  <div class="alert-banner">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body">
+      <div class="alert-title">Evaluación parcial — Dimensión Económica pendiente de validación</div>
+      <div class="alert-text">La dimensión Económica representa el <strong>30% del peso total</strong> de la evaluación y aún no cuenta con datos cargados. Los resultados mostrados corresponden únicamente a Funcional (35%), Técnico (25%) y Proveedor (10%), sobre un máximo de <strong>70 puntos</strong>. La recomendación final está sujeta a la validación de los costos de implementación y mantenimiento.</div>
+    </div>
+  </div>
+
+  <p class="section-label">Evaluación RFP · Vista global</p>
+  <h1 class="section-title">Resultado parcial de la evaluación</h1>
+  <p class="section-sub">Comparación de INTEC y EXPERTICE sobre 26 criterios ponderados en 3 de las 4 dimensiones disponibles.</p>
+
+  <!-- SCORE CARDS -->
+  <div class="score-hero">
+    <div class="score-card intec winner">
+      <div class="winner-badge">▲ Líder parcial</div>
+      <div class="score-provider">INTEC</div>
+      <div class="score-number">65.0<span class="score-denom"> /70</span></div>
+      <div class="score-label">puntos parciales · sin dimensión económica</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:92.8%"></div></div>
+      <div class="score-pct">92.8% del máximo parcial disponible</div>
+    </div>
+    <div class="score-card exp">
+      <div class="score-provider">EXPERTICE</div>
+      <div class="score-number">48.8<span class="score-denom"> /70</span></div>
+      <div class="score-label">puntos parciales · sin dimensión económica</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:69.7%"></div></div>
+      <div class="score-pct">69.7% del máximo parcial disponible</div>
+    </div>
+  </div>
+
+  <!-- META STRIP -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-icon" style="color:var(--intec)">↑</div>
+      <div>
+        <div class="meta-val">+16.2 pts</div>
+        <div class="meta-desc">Ventaja de INTEC sobre EXPERTICE · diferencia relativa +33%</div>
+      </div>
+    </div>
+    <div class="meta-card" style="border-color:rgba(245,158,11,0.3)">
+      <div class="meta-icon" style="color:var(--warn)">◌</div>
+      <div>
+        <div class="meta-val" style="color:var(--warn)">30 pts</div>
+        <div class="meta-desc">En juego · dimensión Económica pendiente de validación</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON BY DIMENSION -->
+  <div class="chart-card" style="margin-bottom:24px">
+    <div class="chart-title">Comparación por dimensión — puntaje ponderado obtenido</div>
+    <div class="dim-chart-wrap">
+      <div class="dim-chart-row">
+        <div class="dim-chart-name" style="color:#f97316">Funcional · 35%</div>
+        <div class="dim-chart-bars">
+          <div class="dim-chart-bar-row">
+            <div class="dim-chart-bar-label intec">INTEC</div>
+            <div class="dim-chart-track"><div class="dim-chart-fill intec" style="width:95%">33.25</div></div>
+          </div>
+          <div class="dim-chart-bar-row">
+            <div class="dim-chart-bar-label exp">EXP</div>
+            <div class="dim-chart-track"><div class="dim-chart-fill exp" style="width:64.1%">22.45</div></div>
+          </div>
+        </div>
+        <div class="dim-chart-max">Máx 35 pts · INTEC lidera por +10.8 pts</div>
+      </div>
+      <div class="dim-chart-row">
+        <div class="dim-chart-name" style="color:#a78bfa">Técnico · 25%</div>
+        <div class="dim-chart-bars">
+          <div class="dim-chart-bar-row">
+            <div class="dim-chart-bar-label intec">INTEC</div>
+            <div class="dim-chart-track"><div class="dim-chart-fill intec" style="width:89%">22.24</div></div>
+          </div>
+          <div class="dim-chart-bar-row">
+            <div class="dim-chart-bar-label exp">EXP</div>
+            <div class="dim-chart-track"><div class="dim-chart-fill exp" style="width:80.75%">20.19</div></div>
+          </div>
+        </div>
+        <div class="dim-chart-max">Máx 25 pts · dimensión más reñida · EXPERTICE gana en Middleware</div>
+      </div>
+      <div class="dim-chart-row">
+        <div class="dim-chart-name" style="color:#67e8f9">Proveedor · 10%</div>
+        <div class="dim-chart-bars">
+          <div class="dim-chart-bar-row">
+            <div class="dim-chart-bar-label intec">INTEC</div>
+            <div class="dim-chart-track"><div class="dim-chart-fill intec" style="width:95%">9.50</div></div>
+          </div>
+          <div class="dim-chart-bar-row">
+            <div class="dim-chart-bar-label exp">EXP</div>
+            <div class="dim-chart-track"><div class="dim-chart-fill exp" style="width:61.5%">6.15</div></div>
+          </div>
+        </div>
+        <div class="dim-chart-max">Máx 10 pts · INTEC: partner oficial Tiendanube y 30+ años de trayectoria ERP</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion">
+    <div class="conclusion-label">→ Conclusión ejecutiva parcial</div>
+    <div class="conclusion-text">
+      Con la información actualmente disponible, <strong>INTEC es el proveedor recomendado</strong>. Lidera en las tres dimensiones evaluadas, con una ventaja de <strong>+16.2 puntos sobre 70 posibles (+33%)</strong>. Su condición de desarrollador nativo del ERP Red Plataforma le otorga una ventaja estructural difícilmente reversible en los criterios de mayor peso individual. EXPERTICE presenta una ventaja real únicamente en Middleware y orquestación de datos (+2.10 pts), reflejando su fortaleza como consultora de arquitectura tecnológica moderna. <strong>Antes de la decisión final es imprescindible validar la dimensión Económica</strong>, que representa el 30% del peso total y podría reducir la brecha de forma significativa.
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!--  S2 — ANÁLISIS POR ÍTEM                   -->
+<!-- ══════════════════════════════════════════ -->
+<section id="s2" class="section">
+
+  <p class="section-label">Evaluación RFP · Detalle de criterios</p>
+  <h1 class="section-title">Análisis interactivo por ítem</h1>
+  <p class="section-sub">26 criterios evaluados. Filtrá, buscá y ordená para explorar cualquier requerimiento específico.</p>
+
+  <!-- FILTERS CARD -->
+  <div class="filters-card">
+    <div class="filters-card-title">Filtros de análisis</div>
+    <div class="filters-bar">
+      <div class="filter-group">
+        <div class="filter-label">Dimensión (Nivel 0)</div>
+        <select class="filter-select" id="f-dim" onchange="onDimChange()">
+          <option value="">Todas las dimensiones</option>
+          <option>Funcional</option>
+          <option>Técnico</option>
+          <option>Proveedor</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Categoría (Nivel 1)</div>
+        <select class="filter-select" id="f-cat" onchange="renderTable()">
+          <option value="">Todas las categorías</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Ganador</div>
+        <select class="filter-select" id="f-winner" onchange="renderTable()">
+          <option value="">Todos</option>
+          <option>INTEC</option>
+          <option>EXPERTICE</option>
+          <option>Empate</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Buscar por keyword</div>
+        <input type="text" class="filter-input" id="f-search" placeholder="Ej: stock, API, factura…" oninput="renderTable()">
+      </div>
+    </div>
+  </div>
+
+  <!-- S2 CHARTS (linked to filters) -->
+  <div class="s2-charts" id="s2-charts-container">
+    <div class="s2-chart-card">
+      <div class="s2-chart-title">Comparación filtrada — puntaje total</div>
+      <div id="s2-chart-a"></div>
+    </div>
+    <div class="s2-chart-card">
+      <div class="s2-chart-title">Top diferencias (ítems filtrados)</div>
+      <div id="s2-chart-c"></div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="sort-bar">
+    <span class="sort-label">Ordenar por:</span>
+    <button class="sort-btn active" id="sort-peso" onclick="setSort('peso', this)">Peso individual ↓</button>
+    <button class="sort-btn" id="sort-diff" onclick="setSort('diff', this)">Mayor diferencia ↓</button>
+    <button class="sort-btn" id="sort-intec" onclick="setSort('intec', this)">Puntaje INTEC ↓</button>
+    <button class="sort-btn" id="sort-exp" onclick="setSort('exp', this)">Puntaje EXPERTICE ↓</button>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-count" id="table-count">Mostrando 26 de 26 ítems</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Ítem evaluado</th>
+          <th>Nivel 0</th>
+          <th>Nivel 1</th>
+          <th>Peso %</th>
+          <th>INTEC</th>
+          <th>Pts INTEC</th>
+          <th>EXPERTICE</th>
+          <th>Pts EXP</th>
+          <th>Δ puntos</th>
+          <th>Ganador</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!--  S4 — MATRIZ DE EVALUACIÓN               -->
+<!-- ══════════════════════════════════════════ -->
+<section id="s4" class="section">
+
+  <p class="section-label">Evaluación RFP · Trazabilidad completa</p>
+  <h1 class="section-title">Matriz de evaluación</h1>
+  <p class="section-sub">Detalle completo de cada criterio evaluado — puntajes, pesos y fundamento de cada calificación asignada. Expandí una fila para leer la justificación.</p>
+
+  <!-- FILTERS -->
+  <div class="matrix-filters-card">
+    <div class="matrix-filters-title">Filtros de análisis</div>
+    <div class="filters-bar">
+      <div class="filter-group">
+        <div class="filter-label">Dimensión (Nivel 0)</div>
+        <select class="filter-select" id="mf-dim" onchange="onMDimChange()">
+          <option value="">Todas las dimensiones</option>
+          <option>Funcional</option>
+          <option>Técnico</option>
+          <option>Proveedor</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Categoría (Nivel 1)</div>
+        <select class="filter-select" id="mf-cat" onchange="renderMatrix()">
+          <option value="">Todas las categorías</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Ganador</div>
+        <select class="filter-select" id="mf-winner" onchange="renderMatrix()">
+          <option value="">Todos</option>
+          <option>INTEC</option>
+          <option>EXPERTICE</option>
+          <option>Empate</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Buscar por keyword</div>
+        <input type="text" class="filter-input" id="mf-search" placeholder="Ej: stock, API, middleware…" oninput="renderMatrix()" style="min-width:180px">
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="matrix-table-wrap">
+    <div class="matrix-count" id="matrix-count">
+      <span>Mostrando 26 de 26 ítems · haz clic en una fila para ver la justificación completa</span>
+      <span class="matrix-legend">
+        <span><span class="ml-dot" style="background:var(--intec)"></span>INTEC</span>
+        <span><span class="ml-dot" style="background:var(--exp)"></span>EXPERTICE</span>
+        <span><span class="ml-dot" style="background:var(--tie)"></span>Empate</span>
+      </span>
+    </div>
+    <div style="overflow-x:auto">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th style="width:30px"></th>
+          <th>Ítem evaluado</th>
+          <th>Nivel 0</th>
+          <th>Nivel 1</th>
+          <th>Peso %</th>
+          <th style="text-align:center;color:var(--intec)">INTEC pts</th>
+          <th style="text-align:center;color:var(--intec)">Pts final</th>
+          <th style="text-align:center;color:var(--exp)">EXP pts</th>
+          <th style="text-align:center;color:var(--exp)">Pts final</th>
+          <th style="text-align:center">Δ</th>
+          <th>Ganador</th>
+        </tr>
+      </thead>
+      <tbody id="matrix-body"></tbody>
+    </table>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ══════════════════════════════════════════ -->
+<!--  S3 — INSIGHTS & RIESGOS                  -->
+<!-- ══════════════════════════════════════════ -->
+<section id="s3" class="section">
+
+  <p class="section-label">Evaluación RFP · Análisis de fondo</p>
+  <h1 class="section-title">Insights & riesgos de la evaluación</h1>
+  <p class="section-sub">Concentración de la ventaja, factores decisivos y puntos críticos de riesgo por proveedor.</p>
+
+  <!-- KPI INSIGHTS — solo lo que no se repite -->
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot warn"></div>
+        <div class="insight-htitle">Ítem de mayor peso individual</div>
+      </div>
+      <div class="insight-big" style="color:var(--warn)">7.35%</div>
+      <div class="insight-sub"><strong style="color:#fff">Conexión Red Plataforma</strong> es el criterio más determinante de toda la evaluación. INTEC lo gana por +1.84 pts al ser el desarrollador nativo del ERP. Un único ítem explica el 11% de la ventaja total de INTEC.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot neutral"></div>
+        <div class="insight-htitle">Categoría de mayor peso</div>
+      </div>
+      <div class="insight-big" style="color:var(--text2)">10.5%</div>
+      <div class="insight-sub"><strong style="color:#fff">B. Integración con ERP Red Plataforma</strong> concentra el mayor peso de toda la evaluación (35% × 30% = 10.5%). INTEC domina esta categoría al ser propietario del código fuente del ERP.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot intec"></div>
+        <div class="insight-htitle">Concentración de la ventaja</div>
+      </div>
+      <div class="insight-big" style="color:var(--intec)">49%</div>
+      <div class="insight-sub">Los <strong style="color:#fff">5 ítems de mayor diferencia</strong> explican el 49% de la brecha total de INTEC (+7.93 de 16.20 pts). La ventaja es robusta y distribuida: no depende de un único criterio.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot exp"></div>
+        <div class="insight-htitle">Ventaja exclusiva de EXPERTICE</div>
+      </div>
+      <div class="insight-big" style="color:var(--exp)">+2.10</div>
+      <div class="insight-sub"><strong style="color:#fff">Middleware y orquestación de datos</strong> es el único ítem donde EXPERTICE supera a INTEC. Su arquitectura desacoplada con Red Hat 3Scale refleja una ventaja real en flexibilidad tecnológica a largo plazo.</div>
+    </div>
+  </div>
+
+  <!-- CONCENTRATION DETAIL -->
+  <div class="full-width-card" style="margin-bottom:24px">
+    <div class="card-title">Concentración de la ventaja — ¿Cuántos ítems explican la diferencia?</div>
+    <div style="font-size:13px; color:var(--text2); margin-bottom:16px; line-height:1.6;">
+      La ventaja de INTEC (<strong style="color:#fff">+16.20 pts</strong>) no está distribuida de forma uniforme. Los <strong style="color:#fff">5 ítems de mayor diferencia</strong> explican el <strong style="color:#fff">49%</strong> de esa ventaja. Esto indica que la decisión es robusta: no depende de un único criterio, pero tampoco requiere que INTEC gane en todos los ítems.
+    </div>
+    <div>
+      <div class="conc-row">
+        <div class="conc-label">Única ventaja de EXPERTICE</div>
+        <div class="conc-track"><div class="conc-fill-exp" style="width:13%"></div></div>
+        <div class="conc-pct" style="color:var(--exp)">−2.10 pts</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-label">Top 1 ítem INTEC (ERP)</div>
+        <div class="conc-track"><div class="conc-fill-intec" style="width:11.3%"></div></div>
+        <div class="conc-pct" style="color:var(--intec)">+1.84 pts</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-label">Top 5 ítems INTEC</div>
+        <div class="conc-track"><div class="conc-fill-intec" style="width:49%"></div></div>
+        <div class="conc-pct" style="color:var(--intec)">+7.93 pts</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-label">Ventaja total INTEC</div>
+        <div class="conc-track"><div class="conc-fill-intec" style="width:100%"></div></div>
+        <div class="conc-pct" style="color:var(--intec)">+16.20 pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS + RISKS -->
+  <div class="grid-2">
+    <div class="insight-card">
+      <div class="card-title">Estadísticas clave de la evaluación</div>
+      <div class="stat-list">
+        <div class="stat-row">
+          <div class="stat-key">Ítems ganados por INTEC</div>
+          <div class="stat-val" style="color:var(--intec)">21 de 26</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítems ganados por EXPERTICE</div>
+          <div class="stat-val" style="color:var(--exp)">1 de 26</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítems empatados</div>
+          <div class="stat-val" style="color:var(--tie)">4 de 26</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítems donde INTEC obtiene 100 pts</div>
+          <div class="stat-val">18</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítems donde EXPERTICE obtiene ≤40 pts</div>
+          <div class="stat-val" style="color:#fca5a5">6</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Peso evaluado</div>
+          <div class="stat-val">70%</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Peso pendiente (Económico)</div>
+          <div class="stat-val" style="color:var(--warn)">30%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="card-title">Análisis de riesgo por proveedor</div>
+      <div class="risk-list">
+        <div class="risk-item high">
+          <div class="risk-top">
+            <div class="risk-name">EXPERTICE · Gestión operativa de pedidos</div>
+            <div class="risk-badge high">Crítico</div>
+          </div>
+          <div class="risk-sub">Puntaje 40 (cumple parcialmente) en un ítem de peso 2.10%. Sin módulo preconfigurado de gestión de pedidos.</div>
+        </div>
+        <div class="risk-item high">
+          <div class="risk-top">
+            <div class="risk-name">EXPERTICE · Validación crédito/morosidad</div>
+            <div class="risk-badge high">Crítico</div>
+          </div>
+          <div class="risk-sub">Puntaje 40 en automatización clave para L'OVAL. Requiere desarrollo a medida sin motor financiero propio.</div>
+        </div>
+        <div class="risk-item med">
+          <div class="risk-top">
+            <div class="risk-name">EXPERTICE · Integración logística LESET</div>
+            <div class="risk-badge med">Moderado</div>
+          </div>
+          <div class="risk-sub">Los 3 ítems de logística obtuvieron puntaje 40, sin portal B2B de fábrica para trazabilidad de entregas.</div>
+        </div>
+        <div class="risk-item med">
+          <div class="risk-top">
+            <div class="risk-name">INTEC · Middleware y orquestación</div>
+            <div class="risk-badge med">Moderado</div>
+          </div>
+          <div class="risk-sub">Puntaje 40. Sin middleware independiente; integraciones acopladas al ERP propio. Riesgo de dependencia en integraciones futuras.</div>
+        </div>
+        <div class="risk-item low">
+          <div class="risk-top">
+            <div class="risk-name">INTEC · Documentación técnica</div>
+            <div class="risk-badge low">Bajo</div>
+          </div>
+          <div class="risk-sub">Puntaje 50 con evidencia parcial. EXPERTICE obtuvo 0 pts en este criterio.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PENDING NOTE -->
+  <div class="alert-banner" style="margin-top:24px">
+    <div class="alert-icon">📋</div>
+    <div class="alert-body">
+      <div class="alert-title">¿Qué falta validar para completar la evaluación?</div>
+      <div class="alert-text">
+        La dimensión Económica concentra <strong>6 ítems pendientes</strong> con un peso combinado del 30%: Costos de integración y configuración (8.1%), Costos de desarrollo y automatizaciones (6.3%), Costos recurrentes de licenciamiento (4.8%), Costos de soporte y mantenimiento (4.2%), Costos de capacitación y puesta en marcha (3.6%), y Costos de actualización y evolución operativa (3.0%).
+        <br><br>
+        Para que EXPERTICE revierta el resultado actual necesitaría obtener <strong>al menos 54 puntos más</strong> que INTEC en la dimensión Económica sobre 30 posibles — lo que matemáticamente es imposible. La ventaja de INTEC es estructuralmente sólida, aunque la dimensión Económica podría reducir la brecha de forma significativa.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</main>
+</div><!-- /#dashboard -->
+
+<script>
+// ── DATA ─────────────────────────────────────────────
+const ITEMS = [
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Sincronización de catálogo, precios y stock","peso":4.9,"intec_pts":100,"exp_pts":75,"intec_final":4.9,"exp_final":3.675,"diff":1.225,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Experiencia de compra B2B","peso":3.5,"intec_pts":100,"exp_pts":75,"intec_final":3.5,"exp_final":2.625,"diff":0.875,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Gestión comercial mayorista","peso":3.5,"intec_pts":100,"exp_pts":75,"intec_final":3.5,"exp_final":2.625,"diff":0.875,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Gestión operativa de pedidos","peso":2.1,"intec_pts":100,"exp_pts":40,"intec_final":2.1,"exp_final":0.84,"diff":1.26,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"B. Integración con ERP Red Plataforma","item":"Conexión Red Plataforma","peso":7.35,"intec_pts":100,"exp_pts":75,"intec_final":7.35,"exp_final":5.5125,"diff":1.8375,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"B. Integración con ERP Red Plataforma","item":"Generación automática de factura en ERP","peso":3.15,"intec_pts":100,"exp_pts":75,"intec_final":3.15,"exp_final":2.3625,"diff":0.7875,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"C. Conexión con logística LESET","item":"Consulta de stock físico en tiempo real","peso":3.15,"intec_pts":75,"exp_pts":40,"intec_final":2.3625,"exp_final":1.26,"diff":1.1025,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"C. Conexión con logística LESET","item":"Notificación del estado de pedido a logística","peso":2.45,"intec_pts":75,"exp_pts":40,"intec_final":1.8375,"exp_final":0.98,"diff":0.8575,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"C. Conexión con logística LESET","item":"Actualización de estado de entrega (trazabilidad)","peso":1.4,"intec_pts":75,"exp_pts":40,"intec_final":1.05,"exp_final":0.56,"diff":0.49,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"D. Automatizaciones","item":"Validación automática de crédito/morosidad","peso":1.75,"intec_pts":100,"exp_pts":40,"intec_final":1.75,"exp_final":0.7,"diff":1.05,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"D. Automatizaciones","item":"Validación por pedido","peso":1.05,"intec_pts":100,"exp_pts":75,"intec_final":1.05,"exp_final":0.7875,"diff":0.2625,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"D. Automatizaciones","item":"Configurar reglas de negocio propias","peso":0.7,"intec_pts":100,"exp_pts":75,"intec_final":0.7,"exp_final":0.525,"diff":0.175,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Conectividad y madurez de API con Tiendanube","peso":5.25,"intec_pts":100,"exp_pts":75,"intec_final":5.25,"exp_final":3.9375,"diff":1.3125,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Conectividad nativa con ERP Red Plataforma","peso":4.375,"intec_pts":100,"exp_pts":75,"intec_final":4.375,"exp_final":3.2812,"diff":1.0938,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Conectividad y flexibilidad de API con LESET","peso":2.625,"intec_pts":75,"exp_pts":75,"intec_final":1.9688,"exp_final":1.9688,"diff":0.0,"winner":"Empate"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Middleware y orquestación de datos","peso":3.5,"intec_pts":40,"exp_pts":100,"intec_final":1.4,"exp_final":3.5,"diff":-2.1,"winner":"EXPERTICE"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Velocidad de sincronización","peso":1.75,"intec_pts":100,"exp_pts":75,"intec_final":1.75,"exp_final":1.3125,"diff":0.4375,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"B. Confidencialidad, Integridad y Disponibilidad","item":"Protocolos de encriptación para datos sensibles","peso":2.25,"intec_pts":100,"exp_pts":100,"intec_final":2.25,"exp_final":2.25,"diff":0.0,"winner":"Empate"},
+  {"dim":"Técnico","cat":"B. Confidencialidad, Integridad y Disponibilidad","item":"Mecanismos de backup automático","peso":4.125,"intec_pts":100,"exp_pts":75,"intec_final":4.125,"exp_final":3.0938,"diff":1.0312,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"B. Confidencialidad, Integridad y Disponibilidad","item":"Gestión de accesos y permisos por rol","peso":1.125,"intec_pts":100,"exp_pts":75,"intec_final":1.125,"exp_final":0.8438,"diff":0.2812,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"A. Experiencia y Trayectoria","item":"Implementaciones comparables","peso":3.0,"intec_pts":100,"exp_pts":50,"intec_final":3.0,"exp_final":1.5,"diff":1.5,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"A. Experiencia y Trayectoria","item":"Certificaciones (partner oficial Tiendanube)","peso":1.8,"intec_pts":100,"exp_pts":75,"intec_final":1.8,"exp_final":1.35,"diff":0.45,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"A. Experiencia y Trayectoria","item":"Adaptabilidad y escalabilidad","peso":1.2,"intec_pts":100,"exp_pts":100,"intec_final":1.2,"exp_final":1.2,"diff":0.0,"winner":"Empate"},
+  {"dim":"Proveedor","cat":"B. Soporte y Servicio","item":"SLA y tiempos de respuesta","peso":1.8,"intec_pts":100,"exp_pts":50,"intec_final":1.8,"exp_final":0.9,"diff":0.9,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"B. Soporte y Servicio","item":"Capacitación técnica","peso":1.2,"intec_pts":100,"exp_pts":100,"intec_final":1.2,"exp_final":1.2,"diff":0.0,"winner":"Empate"},
+  {"dim":"Proveedor","cat":"B. Soporte y Servicio","item":"Documentación entregada","peso":1.0,"intec_pts":50,"exp_pts":0,"intec_final":0.5,"exp_final":0.0,"diff":0.5,"winner":"INTEC"}
+];
+
+// ── AUTH ──────────────────────────────────────────────
+const CREDS = { user: 'APLSI', pass: 'GRUPO5LOVAL' };
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  if (u === CREDS.user && p === CREDS.pass) {
+    localStorage.setItem('loval_session', '1');
+    err.classList.remove('show');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('cover-page').classList.remove('hidden');
+  } else {
+    err.classList.add('show');
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('loval_session');
+  document.getElementById('dashboard').classList.remove('visible');
+  document.getElementById('cover-page').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+function goToDashboard() {
+  document.getElementById('cover-page').classList.add('hidden');
+  document.getElementById('dashboard').classList.add('visible');
+  populateCatFilter();
+  renderTable();
+}
+
+function backToCover() {
+  document.getElementById('dashboard').classList.remove('visible');
+  document.getElementById('cover-page').classList.remove('hidden');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    if (!document.getElementById('login-screen').classList.contains('hidden')) doLogin();
+  }
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('loval_session') === '1') {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('cover-page').classList.remove('hidden');
+  }
+});
+
+// ── NAV ──────────────────────────────────────────────
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  if (id === 's2') {
+    populateCatFilter();
+    renderTable();
+  }
+  if (id === 's4') {
+    onMDimChange();
+  }
+}
+
+// ── STATE ────────────────────────────────────────────
+let sortKey = 'peso';
+
+// ── FILTER ───────────────────────────────────────────
+function populateCatFilter() {
+  const dim = document.getElementById('f-dim').value;
+  const cats = [...new Set(ITEMS.filter(i => !dim || i.dim === dim).map(i => i.cat))];
+  const sel = document.getElementById('f-cat');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Todas las categorías</option>';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    if (c === prev) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function onDimChange() {
+  populateCatFilter();
+  renderTable();
+}
+
+function setSort(key, el) {
+  sortKey = key;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function ptsClass(v) {
+  if (v === 100) return 'pts-100';
+  if (v === 75)  return 'pts-75';
+  if (v === 50)  return 'pts-50';
+  if (v === 40)  return 'pts-40';
+  return 'pts-0';
+}
+
+function getFiltered() {
+  const dim    = document.getElementById('f-dim') ? document.getElementById('f-dim').value : '';
+  const cat    = document.getElementById('f-cat') ? document.getElementById('f-cat').value : '';
+  const winner = document.getElementById('f-winner') ? document.getElementById('f-winner').value : '';
+  const search = document.getElementById('f-search') ? document.getElementById('f-search').value.toLowerCase().trim() : '';
+  return ITEMS.filter(i => {
+    if (dim    && i.dim    !== dim)    return false;
+    if (cat    && i.cat    !== cat)    return false;
+    if (winner && i.winner !== winner) return false;
+    if (search && !i.item.toLowerCase().includes(search) &&
+                  !i.cat.toLowerCase().includes(search) &&
+                  !i.dim.toLowerCase().includes(search))  return false;
+    return true;
+  });
+}
+
+function renderTable() {
+  let data = getFiltered();
+  data.sort((a, b) => {
+    if (sortKey === 'peso')  return b.peso - a.peso;
+    if (sortKey === 'diff')  return Math.abs(b.diff) - Math.abs(a.diff);
+    if (sortKey === 'intec') return b.intec_pts - a.intec_pts;
+    if (sortKey === 'exp')   return b.exp_pts - a.exp_pts;
+  });
+
+  const tc = document.getElementById('table-count');
+  if (tc) tc.textContent = `Mostrando ${data.length} de ${ITEMS.length} ítems`;
+
+  const tbody = document.getElementById('table-body');
+  if (tbody) {
+    tbody.innerHTML = data.map(i => {
+      const diffClass = i.diff > 0 ? 'td-diff-pos' : i.diff < 0 ? 'td-diff-neg' : 'td-diff-zero';
+      const diffStr   = i.diff > 0 ? `+${i.diff.toFixed(2)}` : i.diff === 0 ? '—' : i.diff.toFixed(2);
+      return `
+        <tr>
+          <td style="max-width:220px;white-space:normal;line-height:1.4">${i.item}</td>
+          <td><span class="td-dim ${i.dim}">${i.dim}</span></td>
+          <td class="td-cat">${i.cat}</td>
+          <td class="td-peso"><strong>${i.peso.toFixed(2)}%</strong></td>
+          <td><span class="pts-chip ${ptsClass(i.intec_pts)}">${i.intec_pts}</span></td>
+          <td class="td-final">${i.intec_final.toFixed(2)}</td>
+          <td><span class="pts-chip ${ptsClass(i.exp_pts)}">${i.exp_pts}</span></td>
+          <td class="td-final">${i.exp_final.toFixed(2)}</td>
+          <td class="${diffClass}">${diffStr}</td>
+          <td><span class="winner-chip ${i.winner}">${i.winner}</span></td>
+        </tr>`;
+    }).join('');
+  }
+  renderS2Charts(data);
+}
+
+// ── S2 CHARTS ─────────────────────────────────────────
+function renderS2Charts(data) {
+  // A: Comparación filtrada
+  const totalI = data.reduce((s,d) => s + d.intec_final, 0);
+  const totalE = data.reduce((s,d) => s + d.exp_final, 0);
+  const maxAB  = Math.max(totalI, totalE, 0.01);
+  const diff   = totalI - totalE;
+  const diffStr = diff > 0 ? `+${diff.toFixed(2)}` : diff.toFixed(2);
+  const diffColor = diff > 0 ? 'var(--intec)' : diff < 0 ? 'var(--exp)' : 'var(--text3)';
+
+  const chartA = document.getElementById('s2-chart-a');
+  if (chartA) {
+    chartA.innerHTML = `
+      <div class="hbar-wrap">
+        <div class="hbar-row">
+          <div class="hbar-label">INTEC</div>
+          <div class="hbar-track">
+            <div class="hbar-fill intec" style="width:${(totalI/maxAB*100).toFixed(1)}%;min-width:20px">${totalI.toFixed(2)}</div>
+          </div>
+        </div>
+        <div class="hbar-row">
+          <div class="hbar-label">EXPERTICE</div>
+          <div class="hbar-track">
+            <div class="hbar-fill exp" style="width:${(totalE/maxAB*100).toFixed(1)}%;min-width:20px">${totalE.toFixed(2)}</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text3)">
+        ${data.length} ítem${data.length !== 1 ? 's' : ''} filtrado${data.length !== 1 ? 's' : ''} · Δ <span style="color:${diffColor};font-weight:600">${diffStr}</span>
+      </div>`;
+  }
+
+  // C: Top diferencias (filtrado)
+  const sorted = [...data].sort((a,b) => Math.abs(b.diff) - Math.abs(a.diff)).slice(0,5);
+  const maxD = Math.max(...sorted.map(d => Math.abs(d.diff)), 0.01);
+  const chartC = document.getElementById('s2-chart-c');
+  if (chartC) {
+    if (sorted.length === 0) {
+      chartC.innerHTML = `<div style="color:var(--text3);font-size:12px;padding:8px 0">Sin ítems para mostrar</div>`;
+    } else {
+      chartC.innerHTML = sorted.map((item, i) => {
+        const cls = item.diff >= 0 ? 'intec' : 'exp';
+        const delta = Math.abs(item.diff);
+        const pct = (delta / maxD * 100).toFixed(1);
+        const sign = item.diff >= 0 ? `+${delta.toFixed(2)}` : `−${delta.toFixed(2)}`;
+        return `<div class="dc-row" style="margin-bottom:7px">
+          <div class="dc-rank">#${i+1}</div>
+          <div class="dc-name" style="width:155px;font-size:11px">${item.item}</div>
+          <div class="dc-track"><div class="dc-fill ${cls}" style="width:${pct}%"></div></div>
+          <div class="dc-delta ${cls}" style="font-size:11px">${sign}</div>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+// ── MATRIZ DE EVALUACIÓN ─────────────────────────────
+
+// Full justification data from COMPARACION sheet
+const MATRIX_JUST = {
+  "Sincronización de catálogo, precios y stock": {
+    intec: 'Módulo "Ventas Digital" sincroniza automáticamente catálogos, stock, variantes y listas de precios/descuentos en tiempo real, sin desarrollos adicionales.',
+    exp:   'No comercializa conector cerrado out-of-the-box. Requiere configurar y mapear la API pública de Tiendanube usando sus plataformas de integración.'
+  },
+  "Experiencia de compra B2B": {
+    intec: '"Ventas Digital" diseñado específicamente para canal B2B. Sincroniza de forma nativa listas de precios diferenciadas, condiciones mayoristas y descuentos por volumen.',
+    exp:   'No provee producto cerrado de ecommerce B2B. Cuenta con experiencia en integración de reglas de negocio complejas mediante APIs y microservicios.'
+  },
+  "Gestión comercial mayorista": {
+    intec: '"Ventas Digital" diseñado para B2B. Gestiona precios diferenciados, descuentos por volumen y condiciones comerciales de forma nativa en el ERP.',
+    exp:   'No posee motor de reglas comerciales preconfigurado. Requiere programar y adaptar la lógica de descuentos mediante integración de APIs con la base de datos central.'
+  },
+  "Gestión operativa de pedidos": {
+    intec: 'Módulo "Ventas Digital" centraliza el ciclo del pedido en tiempo real dentro de Plataforma ERP, automatizando actualización de estados y eliminando carga manual.',
+    exp:   'No ofrece software de gestión de pedidos preconfigurado. Requiere modelar el flujo de estados y automatizar transacciones conectando bases de datos mediante APIs.'
+  },
+  "Conexión Red Plataforma": {
+    intec: 'Desarrollador nativo y propietario del código de Red Plataforma. Acceso directo a tablas core mediante código interno, sin riesgos de incompatibilidad.',
+    exp:   'Requiere obligatoriamente que el módulo API REST de Red Plataforma esté activo y expuesto. Conexión indirecta consumiendo endpoints, sin tocar el código base.'
+  },
+  "Generación automática de factura en ERP": {
+    intec: 'Desarrolladores nativos de Plataforma ERP. Generación automática de facturas post-validación es función centralizada out-of-the-box, sin puentes externos.',
+    exp:   'No son dueños del ERP. Requiere adaptación menor para configurar APIs/servicios web que comuniquen su solución con el ERP para la emisión automática.'
+  },
+  "Consulta de stock físico en tiempo real": {
+    intec: 'No posee conexión directa con LESET de fábrica. Sin embargo, ERP cuenta con lógica nativa multi-depósito, requiriendo solo configurar módulos de conectividad.',
+    exp:   'Solo cubre la capa de conectividad técnica. Requiere desarrollar a medida la lógica de almacenamiento e interpretación del stock para el portal.'
+  },
+  "Notificación del estado de pedido a logística": {
+    intec: 'Cuenta con gestión de pedidos. Al ser LESET un tercero, requiere adaptar y configurar un canal de salida de datos (API) para transmitir la orden sin intervención manual.',
+    exp:   'Requiere desarrollo de lógica de integración a medida para mapear datos del portal, transformarlos al formato de LESET y gatillar el envío automatizado.'
+  },
+  "Actualización de estado de entrega (trazabilidad)": {
+    intec: 'ERP base no cuenta con conector nativo para LESET. Poseer módulo "Ventas Digital" limita el esfuerzo a configurar y adaptar la API para recibir estados del transportista.',
+    exp:   'Carece de portal B2B o sección "Mis Pedidos" de fábrica. Requiere desarrollar desde cero backend para procesar Webhooks/APIs de LESET e interfaz visual.'
+  },
+  "Validación automática de crédito/morosidad": {
+    intec: 'Desarrollador de Plataforma ERP. Sus módulos web viven sobre la misma base de datos contable. Motor nativo para verificar morosidad y bloquear/liberar pedidos automáticamente.',
+    exp:   'No dispone de módulo de cuenta corriente de caja. Pueden conectarse vía API al ERP para leer el dato, pero deben desarrollar a medida la lógica de decisión automatizada.'
+  },
+  "Validación por pedido": {
+    intec: 'Plataforma ERP incluye de forma estándar un flujo de aprobación de pedidos (Workflow) con alertas para autorización humana excepcional en mesa de control.',
+    exp:   'Panel administrativo con botones Aprobar/Rechazar es funcionalidad estándar en proyectos a medida. Requiere configurar interfaz visual y alertas usando herramientas de microservicios.'
+  },
+  "Configurar reglas de negocio propias": {
+    intec: 'Parametrización de listas de precios, matrices de descuentos y condiciones comerciales es una de las funcionalidades más robustas y nativas de Plataforma ERP.',
+    exp:   'Puede programar motor de reglas dinámicas, pero requerirá estructurar base de datos y una interfaz para cargar condicionales, en lugar de venir listo para usar.'
+  },
+  "Conectividad y madurez de API con Tiendanube": {
+    intec: 'Con módulo oficial "Ventas Digital", la comunicación técnica mediante Webhooks y endpoints de Tiendanube ya viene programada, probada y homologada de fábrica.',
+    exp:   'Consultora experta en APIs REST y Webhooks. Requiere adaptación menor para codificar el puente técnico específico hacia la API pública de Tiendanube.'
+  },
+  "Conectividad nativa con ERP Red Plataforma": {
+    intec: 'Creadores y dueños del código fuente. Exposición de datos de tablas core mediante servicios web internos es directa, transparente y sin ingeniería inversa.',
+    exp:   'Capacidad técnica absoluta para consumir servicios web. Al no ser propietarios del ERP, dependen de la documentación de APIs que provea INTEC.'
+  },
+  "Conectividad y flexibilidad de API con LESET": {
+    intec: 'Posee módulos de conectividad genéricos (APIs). Al tratarse de WMS de tercero privado, deberán configurar y mapear la estructura de datos de LESET.',
+    exp:   'Escenario ideal para consultora: diseñar conector a medida basado en APIs REST/Webhooks. Sigue siendo adaptación menor (horas de desarrollo del puente técnico).'
+  },
+  "Middleware y orquestación de datos": {
+    intec: 'ERP centraliza en su propia base de datos relacional. No utiliza middleware independiente de caja; procesa integraciones acopladas a sus propios módulos.',
+    exp:   'Propuesta de valor técnica basada en arquitectura de integración moderna con Red Hat 3Scale para gestión avanzada de APIs. Garantiza desacoplamiento absoluto sin tocar código core.'
+  },
+  "Velocidad de sincronización": {
+    intec: 'Portal B2B conectado directamente a la base de datos de Plataforma ERP. Actualización de listas de precios y recepción de pedidos ocurre de forma inmediata en Real Time.',
+    exp:   'Mediante Webhooks y microservicios basados en eventos, garantizan sincronización near real-time. Se califica 75 porque la inmediatez dependerá de latencia de sistemas externos.'
+  },
+  "Protocolos de encriptación para datos sensibles": {
+    intec: 'Conexiones entre Plataforma ERP y extensiones web operan con HTTPS y cifrado SSL/TLS (mínimo TLS 1.2 o 1.3). Datos de clientes, pedidos y precios viajan cifrados extremo a extremo.',
+    exp:   'Encriptación en tránsito es práctica mandatoria. Con Red Hat 3Scale integran políticas SSL/TLS, tokens OAuth2/JWT y protección de endpoints de manera nativa en la infraestructura.'
+  },
+  "Mecanismos de backup automático": {
+    intec: 'Plataforma ERP (Cloud SaaS y On-Premise) incluye esquemas estandarizados de copias de seguridad automatizadas y recurrentes con políticas de recuperación ante desastres (DRP).',
+    exp:   'No proveen software con backup preconfigurado. Implementan y configuran rutinas de respaldo automatizado a nivel de infraestructura (AWS/Azure) mediante Cronjobs/Pipelines.'
+  },
+  "Gestión de accesos y permisos por rol": {
+    intec: 'Módulo nativo ultra-detallado de administración de usuarios, perfiles y seguridad. Define granularmente qué pantallas, reportes o depósitos puede ver cada rol.',
+    exp:   'Pueden desarrollar cualquier matriz RBAC. Se califica 75 porque no viene construida la interfaz estándar; la consultora debe diseñar la tabla de permisos y programar la lógica visual.'
+  },
+  "Implementaciones comparables": {
+    intec: 'Evidencia pública de trayectoria ERP: +900 clientes, +30 años, casos publicados (Brand Team B2B, Bagués, automatización comercial).',
+    exp:   'Evidencia técnica de integración y arquitectura, pero no suficientemente específica de implementaciones comparables al contexto L\'OVAL (ecommerce B2B / operación comercial digital).'
+  },
+  "Certificaciones (partner oficial Tiendanube)": {
+    intec: 'Es partner oficial de Tiendanube. Certificación verificada y pública.',
+    exp:   'No se encontró evidencia de certificación oficial como partner de Tiendanube.'
+  },
+  "Adaptabilidad y escalabilidad": {
+    intec: 'Altamente escalable dentro de su ecosistema ERP. Para integraciones con sistemas no contemplados, requiere depender de tiempos y desarrollos propios de la casa de software.',
+    exp:   'Diseño desacoplado mediante APIs y microservicios. Con capa de middleware, la solución es adaptable: cambiar WMS o expandir a otra plataforma solo requiere modificar el conector específico.'
+  },
+  "SLA y tiempos de respuesta": {
+    intec: 'Evidencia disponible de acuerdos de nivel de servicio y soporte ante incidentes críticos.',
+    exp:   'Evidencia disponible pero más limitada en comparación con INTEC para el contexto específico de L\'OVAL.'
+  },
+  "Capacitación técnica": {
+    intec: 'Evidencia disponible de programas de capacitación para usuarios y equipos técnicos.',
+    exp:   'Evidencia disponible de capacitación técnica comparable.'
+  },
+  "Documentación entregada": {
+    intec: 'Se detalla existencia de instructivos pero evidencia de documentación técnica detallada es parcial.',
+    exp:   'No se encontró evidencia pública suficiente de documentación técnica entregada.'
+  }
+};
+
+function ptsClass2(v) {
+  if (v === 100) return 'p100';
+  if (v === 75)  return 'p75';
+  if (v === 50)  return 'p50';
+  if (v === 40)  return 'p40';
+  return 'p0';
+}
+
+function getMFiltered() {
+  const dim    = document.getElementById('mf-dim')    ? document.getElementById('mf-dim').value    : '';
+  const cat    = document.getElementById('mf-cat')    ? document.getElementById('mf-cat').value    : '';
+  const winner = document.getElementById('mf-winner') ? document.getElementById('mf-winner').value : '';
+  const search = document.getElementById('mf-search') ? document.getElementById('mf-search').value.toLowerCase().trim() : '';
+  return ITEMS.filter(i => {
+    if (dim    && i.dim    !== dim)    return false;
+    if (cat    && i.cat    !== cat)    return false;
+    if (winner && i.winner !== winner) return false;
+    if (search && !i.item.toLowerCase().includes(search) &&
+                  !i.cat.toLowerCase().includes(search)  &&
+                  !i.dim.toLowerCase().includes(search))  return false;
+    return true;
+  });
+}
+
+function onMDimChange() {
+  const dim = document.getElementById('mf-dim').value;
+  const cats = [...new Set(ITEMS.filter(i => !dim || i.dim === dim).map(i => i.cat))];
+  const sel = document.getElementById('mf-cat');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Todas las categorías</option>';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    if (c === prev) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  renderMatrix();
+}
+
+function toggleMatrixRow(idx) {
+  const mrow = document.getElementById('mrow-' + idx);
+  const drow = document.getElementById('drow-' + idx);
+  if (!mrow || !drow) return;
+  const isOpen = mrow.classList.contains('expanded');
+  // close all
+  document.querySelectorAll('.mrow.expanded').forEach(r => r.classList.remove('expanded'));
+  document.querySelectorAll('.detail-row').forEach(r => r.classList.add('hidden'));
+  if (!isOpen) {
+    mrow.classList.add('expanded');
+    drow.classList.remove('hidden');
+  }
+}
+
+function renderMatrix() {
+  const data = getMFiltered();
+  const mc = document.getElementById('matrix-count');
+  if (mc) {
+    mc.querySelector('span').textContent = `Mostrando ${data.length} de ${ITEMS.length} ítems · clic en una fila para ver la justificación completa`;
+  }
+  const tbody = document.getElementById('matrix-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = data.map((item, idx) => {
+    const just = MATRIX_JUST[item.item] || { intec: '—', exp: '—' };
+    const diffClass = item.diff > 0 ? 'pos' : item.diff < 0 ? 'neg' : 'zer';
+    const diffStr   = item.diff > 0 ? `+${item.diff.toFixed(2)}` : item.diff === 0 ? '=' : item.diff.toFixed(2);
+    const dimColor  = item.dim === 'Funcional' ? '#f97316' : item.dim === 'Técnico' ? '#a78bfa' : '#67e8f9';
+
+    // Short snippet for tooltip feel
+    const intecSnip = just.intec.length > 90 ? just.intec.slice(0, 90) + '…' : just.intec;
+    const expSnip   = just.exp.length > 90   ? just.exp.slice(0, 90)   + '…' : just.exp;
+
+    const mainRow = `<tr class="mrow" id="mrow-${idx}" onclick="toggleMatrixRow(${idx})">
+      <td><span class="expand-icon">▶</span></td>
+      <td class="td-item-name">
+        <div>${item.item}</div>
+        <div class="item-cat">${item.cat}</div>
+      </td>
+      <td><span style="font-size:11px;font-weight:600;color:${dimColor};text-transform:uppercase;letter-spacing:.04em">${item.dim}</span></td>
+      <td style="font-size:11px;color:var(--text3);max-width:140px">${item.cat}</td>
+      <td><strong style="color:#fff;font-size:12px">${item.peso.toFixed(2)}%</strong></td>
+      <td style="text-align:center"><span class="pts-chip ${ptsClass(item.intec_pts)}">${item.intec_pts}</span></td>
+      <td style="text-align:center;font-weight:600;color:var(--intec);font-size:12px">${item.intec_final.toFixed(2)}</td>
+      <td style="text-align:center"><span class="pts-chip ${ptsClass(item.exp_pts)}">${item.exp_pts}</span></td>
+      <td style="text-align:center;font-weight:600;color:var(--exp);font-size:12px">${item.exp_final.toFixed(2)}</td>
+      <td style="text-align:center"><span class="diff-chip ${diffClass}">${diffStr}</span></td>
+      <td><span class="winner-m ${item.winner}">${item.winner}</span></td>
+    </tr>`;
+
+    const detailRow = `<tr class="detail-row hidden" id="drow-${idx}">
+      <td colspan="11">
+        <div class="detail-inner">
+          <div class="just-card intec-j">
+            <div class="just-header intec">INTEC · <span class="pts-badge ${ptsClass2(item.intec_pts)}" style="display:inline-flex">${item.intec_pts} pts</span></div>
+            <div class="just-text">${just.intec}</div>
+          </div>
+          <div class="just-card exp-j">
+            <div class="just-header exp">EXPERTICE · <span class="pts-badge ${ptsClass2(item.exp_pts)}" style="display:inline-flex">${item.exp_pts} pts</span></div>
+            <div class="just-text">${just.exp}</div>
+          </div>
+        </div>
+      </td>
+    </tr>`;
+
+    return mainRow + detailRow;
+  }).join('');
+}
+</script>
+</body>
+</html>
