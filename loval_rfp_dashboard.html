@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'OVAL · Evaluación de Proveedores · RFP 2025</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1c2330;
+    --border:    #2a3441;
+    --border2:   #374151;
+    --intec:     #3b82f6;
+    --intec-dim: #1d4ed8;
+    --intec-bg:  rgba(59,130,246,0.08);
+    --exp:       #10b981;
+    --exp-dim:   #065f46;
+    --exp-bg:    rgba(16,185,129,0.08);
+    --warn:      #f59e0b;
+    --warn-bg:   rgba(245,158,11,0.10);
+    --muted:     #6b7280;
+    --text:      #e5e7eb;
+    --text2:     #9ca3af;
+    --text3:     #6b7280;
+    --radius:    12px;
+    --radius-sm: 8px;
+    --tie:       #8b5cf6;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ────────────────────────────── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+  .header-sep { width: 1px; height: 20px; background: var(--border2); }
+  .header-title { color: var(--text2); font-size: 13px; font-weight: 400; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .badge-warn {
+    background: var(--warn-bg);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: var(--warn);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .header-date { color: var(--text3); font-size: 12px; }
+
+  /* ── NAV ────────────────────────────────── */
+  .nav-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex;
+    gap: 0;
+  }
+  .nav-tab {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    user-select: none;
+    letter-spacing: 0.02em;
+  }
+  .nav-tab:hover { color: var(--text2); }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--intec); }
+
+  /* ── MAIN ───────────────────────────────── */
+  .main { max-width: 1200px; margin: 0 auto; padding: 36px 40px 80px; }
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
+
+  /* ── ALERT BANNER ──────────────────────── */
+  .alert-banner {
+    background: var(--warn-bg);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .alert-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .alert-body { flex: 1; }
+  .alert-title { font-weight: 600; color: var(--warn); font-size: 13px; margin-bottom: 2px; }
+  .alert-text { color: var(--text2); font-size: 12.5px; line-height: 1.5; }
+
+  /* ── SECTION HEADER ─────────────────────── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    color: var(--text2);
+    font-size: 13.5px;
+    margin-bottom: 32px;
+  }
+
+  /* ── GRID UTILITIES ─────────────────────── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  /* ── CARD ───────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .card-sm { padding: 18px 20px; }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  /* ── SCORE CARDS ─────────────────────────── */
+  .score-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 28px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-card.winner { border-color: rgba(59,130,246,0.4); }
+  .score-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .score-card.intec::before { background: var(--intec); }
+  .score-card.exp::before { background: var(--exp); }
+  .score-provider {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .score-card.intec .score-provider { color: var(--intec); }
+  .score-card.exp .score-provider { color: var(--exp); }
+  .score-number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 52px;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 2px;
+  }
+  .score-denom { font-size: 18px; color: var(--text3); font-weight: 300; }
+  .score-label { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
+  .score-bar-wrap {
+    background: var(--bg);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .score-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+  .score-card.intec .score-bar { background: var(--intec); }
+  .score-card.exp .score-bar { background: var(--exp); }
+  .score-pct { font-size: 12px; color: var(--text2); margin-top: 6px; }
+  .winner-badge {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: var(--intec-bg);
+    border: 1px solid rgba(59,130,246,0.3);
+    color: var(--intec);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+
+  /* ── DIFF + PENDING STRIP ───────────────── */
+  .meta-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .meta-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .meta-icon { font-size: 22px; }
+  .meta-val { font-family: 'DM Serif Display', serif; font-size: 24px; color: #fff; line-height: 1; }
+  .meta-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  /* ── DIM COMPARISON ─────────────────────── */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .dim-card.pending {
+    border-style: dashed;
+    opacity: .6;
+  }
+  .dim-name {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+  }
+  .dim-winner {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .dim-winner.intec { color: var(--intec); }
+  .dim-winner.exp { color: var(--exp); }
+  .dim-winner.pending { color: var(--text3); }
+  .dim-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .dim-prov {
+    font-size: 11px;
+    font-weight: 600;
+    width: 72px;
+    flex-shrink: 0;
+  }
+  .dim-prov.intec { color: var(--intec); }
+  .dim-prov.exp { color: var(--exp); }
+  .dim-track {
+    flex: 1;
+    background: var(--bg);
+    height: 5px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .dim-fill { height: 100%; border-radius: 3px; }
+  .dim-fill.intec { background: var(--intec); }
+  .dim-fill.exp { background: var(--exp); }
+  .dim-score { font-size: 12px; color: var(--text2); width: 36px; text-align: right; flex-shrink: 0; }
+  .dim-diff {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .dim-diff strong { color: var(--text2); }
+
+  /* ── DRIVER ITEMS ───────────────────────── */
+  .drivers-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .driver-list { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 22px; }
+  .driver-list-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .driver-list-title.intec { color: var(--intec); }
+  .driver-list-title.exp { color: var(--exp); }
+  .driver-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .driver-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .driver-rank {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text3);
+    width: 18px;
+    flex-shrink: 0;
+  }
+  .driver-bar-wrap { flex: 1; min-width: 0; }
+  .driver-name { font-size: 12.5px; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .driver-mini-bar { height: 3px; border-radius: 2px; }
+  .driver-mini-bar.intec { background: var(--intec); }
+  .driver-mini-bar.exp { background: var(--exp); }
+  .driver-delta { font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .driver-delta.intec { color: var(--intec); }
+  .driver-delta.exp { color: var(--exp); }
+
+  /* ── CONCLUSION BOX ─────────────────────── */
+  .conclusion {
+    background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, rgba(16,185,129,0.03) 100%);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+  .conclusion-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--intec);
+    margin-bottom: 8px;
+  }
+  .conclusion-text { color: var(--text); font-size: 14px; line-height: 1.7; }
+  .conclusion-text strong { color: #fff; }
+
+  /* ── SECTION 2 — TABLA ──────────────────── */
+  .filters-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-label { font-size: 11px; color: var(--text3); font-weight: 500; }
+  .filter-select, .filter-input {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 7px 12px;
+    outline: none;
+    transition: border-color .2s;
+    min-width: 140px;
+  }
+  .filter-select:focus, .filter-input:focus { border-color: var(--intec); }
+  .filter-input { min-width: 200px; }
+  option { background: #1c2330; }
+
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .sort-label { font-size: 12px; color: var(--text3); }
+  .sort-btn {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    color: var(--text2);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .sort-btn:hover { border-color: var(--intec); color: var(--intec); }
+  .sort-btn.active { background: var(--intec-bg); border-color: var(--intec); color: var(--intec); }
+
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .table-count {
+    font-size: 12px;
+    color: var(--text3);
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    background: var(--surface2);
+    padding: 11px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text3);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  thead th:first-child { padding-left: 18px; }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td {
+    padding: 11px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    vertical-align: middle;
+  }
+  tbody td:first-child { padding-left: 18px; color: var(--text); }
+  .td-dim {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .td-dim.Funcional { color: #f97316; }
+  .td-dim.Técnico { color: #a78bfa; }
+  .td-dim.Proveedor { color: #67e8f9; }
+  .td-cat { color: var(--text3); font-size: 12px; }
+  .td-peso { font-variant-numeric: tabular-nums; }
+  .td-peso strong { color: #fff; font-weight: 600; }
+  .pts-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 2px 8px;
+    min-width: 36px;
+  }
+  .pts-100 { background: rgba(16,185,129,0.15); color: #34d399; }
+  .pts-75  { background: rgba(59,130,246,0.12); color: #93c5fd; }
+  .pts-50  { background: rgba(245,158,11,0.12); color: #fcd34d; }
+  .pts-40  { background: rgba(239,68,68,0.12);  color: #fca5a5; }
+  .pts-0   { background: rgba(107,114,128,0.15); color: #6b7280; }
+  .td-final { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 500; }
+  .td-diff-pos { color: var(--intec); font-weight: 600; }
+  .td-diff-neg { color: var(--exp); font-weight: 600; }
+  .td-diff-zero { color: var(--text3); }
+  .winner-chip {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+  .winner-chip.INTEC { background: var(--intec-bg); color: var(--intec); border: 1px solid rgba(59,130,246,0.25); }
+  .winner-chip.EXPERTICE { background: var(--exp-bg); color: var(--exp); border: 1px solid rgba(16,185,129,0.25); }
+  .winner-chip.Empate { background: rgba(139,92,246,0.1); color: var(--tie); border: 1px solid rgba(139,92,246,0.25); }
+
+  /* ── SECTION 3 — INSIGHTS ───────────────── */
+  .insights-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .insight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .insight-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .insight-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .insight-dot.intec { background: var(--intec); }
+  .insight-dot.exp { background: var(--exp); }
+  .insight-dot.neutral { background: var(--text3); }
+  .insight-dot.warn { background: var(--warn); }
+  .insight-htitle {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text2);
+  }
+  .insight-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .insight-sub { font-size: 12.5px; color: var(--text2); line-height: 1.5; }
+
+  .stat-list { display: flex; flex-direction: column; gap: 10px; }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .stat-key { color: var(--text2); }
+  .stat-val { font-weight: 600; color: #fff; }
+
+  .concentration-bar {
+    margin-top: 10px;
+  }
+  .conc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .conc-label { font-size: 12px; color: var(--text2); width: 130px; flex-shrink: 0; }
+  .conc-track { flex: 1; background: var(--bg); height: 6px; border-radius: 3px; overflow: hidden; }
+  .conc-fill-intec { height: 100%; background: var(--intec); border-radius: 3px; }
+  .conc-fill-exp { height: 100%; background: var(--exp); border-radius: 3px; }
+  .conc-pct { font-size: 12px; color: var(--text2); width: 36px; text-align: right; }
+
+  .risk-list { display: flex; flex-direction: column; gap: 8px; }
+  .risk-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .risk-item.high { border-left: 3px solid #ef4444; }
+  .risk-item.med  { border-left: 3px solid var(--warn); }
+  .risk-item.low  { border-left: 3px solid var(--text3); }
+  .risk-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+  .risk-name { font-size: 13px; color: var(--text); font-weight: 500; }
+  .risk-badge { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .risk-badge.high { color: #ef4444; }
+  .risk-badge.med  { color: var(--warn); }
+  .risk-badge.low  { color: var(--text3); }
+  .risk-sub { font-size: 12px; color: var(--text3); }
+
+  .full-width-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 16px;
+  }
+  .full-width-card .card-title { margin-bottom: 14px; }
+
+  /* Vertical chart for category weights */
+  .cat-chart { display: flex; flex-direction: column; gap: 9px; }
+  .cat-row { display: flex; align-items: center; gap: 10px; }
+  .cat-name { font-size: 12px; color: var(--text2); min-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-tracks { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .cat-track { height: 5px; border-radius: 3px; overflow: hidden; background: var(--bg); }
+  .cat-fill-intec { height: 100%; background: var(--intec); border-radius: 3px; }
+  .cat-fill-exp   { height: 100%; background: var(--exp); border-radius: 3px; }
+  .cat-scores { font-size: 11px; color: var(--text3); display: flex; gap: 6px; }
+  .cat-sc-intec { color: rgba(59,130,246,0.8); }
+  .cat-sc-exp   { color: rgba(16,185,129,0.8); }
+
+  /* ── RESPONSIVE ─────────────────────────── */
+  @media (max-width: 768px) {
+    .main { padding: 20px 16px 60px; }
+    .header { padding: 0 16px; }
+    .nav-tabs { padding: 0 16px; overflow-x: auto; }
+    .score-hero, .meta-strip, .drivers-wrap, .insights-grid { grid-template-columns: 1fr; }
+    .dim-grid { grid-template-columns: 1fr; }
+    .filters-bar { flex-direction: column; }
+    .filter-select, .filter-input { min-width: unset; width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">L'OVAL</div>
+    <div class="header-sep"></div>
+    <div class="header-title">Evaluación de Proveedores · Transformación Digital B2B</div>
+  </div>
+  <div class="header-right">
+    <div class="badge-warn">⚠ Económico pendiente</div>
+    <div class="header-date">Mayo 2025</div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <div class="nav-tab active" onclick="showSection('s1', this)">Resumen ejecutivo</div>
+  <div class="nav-tab" onclick="showSection('s2', this)">Análisis por ítem</div>
+  <div class="nav-tab" onclick="showSection('s3', this)">Insights & riesgos</div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  SECCIÓN 1 — RESUMEN EJECUTIVO                     -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s1" class="section active">
+
+  <!-- ALERT -->
+  <div class="alert-banner">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-body">
+      <div class="alert-title">Evaluación parcial — Dimensión Económica pendiente de validación</div>
+      <div class="alert-text">La dimensión Económica representa el <strong>30% del peso total</strong> de la evaluación y aún no cuenta con datos cargados. Los resultados mostrados corresponden únicamente a las dimensiones Funcional (35%), Técnico (25%) y Proveedor (10%), sobre un máximo de <strong>70 puntos</strong>. La recomendación final está sujeta a la validación de los costos de implementación y mantenimiento.</div>
+    </div>
+  </div>
+
+  <p class="section-label">Evaluación RFP · Vista global</p>
+  <h1 class="section-title">Resultado parcial de la evaluación</h1>
+  <p class="section-sub">Comparación de INTEC y EXPERTICE sobre 26 criterios ponderados en 3 de las 4 dimensiones disponibles.</p>
+
+  <!-- SCORE CARDS -->
+  <div class="score-hero">
+    <div class="score-card intec winner">
+      <div class="winner-badge">▲ Líder parcial</div>
+      <div class="score-provider">INTEC</div>
+      <div class="score-number">65.0<span class="score-denom"> /70</span></div>
+      <div class="score-label">puntos parciales · sin dimensión económica</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar" style="width:92.8%"></div>
+      </div>
+      <div class="score-pct">92.8% del máximo parcial disponible</div>
+    </div>
+    <div class="score-card exp">
+      <div class="score-provider">EXPERTICE</div>
+      <div class="score-number">48.8<span class="score-denom"> /70</span></div>
+      <div class="score-label">puntos parciales · sin dimensión económica</div>
+      <div class="score-bar-wrap">
+        <div class="score-bar" style="width:69.7%"></div>
+      </div>
+      <div class="score-pct">69.7% del máximo parcial disponible</div>
+    </div>
+  </div>
+
+  <!-- META STRIP -->
+  <div class="meta-strip">
+    <div class="meta-card">
+      <div class="meta-icon" style="color:var(--intec)">↑</div>
+      <div>
+        <div class="meta-val">+16.2 pts</div>
+        <div class="meta-desc">Ventaja de INTEC sobre EXPERTICE · diferencia relativa +33%</div>
+      </div>
+    </div>
+    <div class="meta-card" style="border-color:rgba(245,158,11,0.3)">
+      <div class="meta-icon" style="color:var(--warn)">◌</div>
+      <div>
+        <div class="meta-val" style="color:var(--warn)">30 pts</div>
+        <div class="meta-desc">En juego · dimensión Económica pendiente de validación</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIMENSION CARDS -->
+  <div style="margin-bottom:10px">
+    <div class="section-label">Desglose por dimensión</div>
+  </div>
+  <div class="dim-grid">
+    <!-- FUNCIONAL -->
+    <div class="dim-card">
+      <div class="dim-name">Funcional · 35% del total</div>
+      <div class="dim-winner intec">▲ INTEC lidera por +10.8 pts</div>
+      <div class="dim-row">
+        <div class="dim-prov intec">INTEC</div>
+        <div class="dim-track"><div class="dim-fill intec" style="width:95%"></div></div>
+        <div class="dim-score">33.25</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-prov exp">EXPERTICE</div>
+        <div class="dim-track"><div class="dim-fill exp" style="width:64.1%"></div></div>
+        <div class="dim-score">22.45</div>
+      </div>
+      <div class="dim-diff">Máx. posible: <strong>35 pts</strong> · INTEC cubre 95%, EXPERTICE 64%</div>
+    </div>
+    <!-- TÉCNICO -->
+    <div class="dim-card">
+      <div class="dim-name">Técnico · 25% del total</div>
+      <div class="dim-winner intec">▲ INTEC lidera por +2.1 pts</div>
+      <div class="dim-row">
+        <div class="dim-prov intec">INTEC</div>
+        <div class="dim-track"><div class="dim-fill intec" style="width:89%"></div></div>
+        <div class="dim-score">22.24</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-prov exp">EXPERTICE</div>
+        <div class="dim-track"><div class="dim-fill exp" style="width:80.75%"></div></div>
+        <div class="dim-score">20.19</div>
+      </div>
+      <div class="dim-diff">Máx. posible: <strong>25 pts</strong> · dimensión más reñida · EXPERTICE gana en Middleware</div>
+    </div>
+    <!-- PROVEEDOR -->
+    <div class="dim-card">
+      <div class="dim-name">Proveedor · 10% del total</div>
+      <div class="dim-winner intec">▲ INTEC lidera por +3.35 pts</div>
+      <div class="dim-row">
+        <div class="dim-prov intec">INTEC</div>
+        <div class="dim-track"><div class="dim-fill intec" style="width:95%"></div></div>
+        <div class="dim-score">9.50</div>
+      </div>
+      <div class="dim-row">
+        <div class="dim-prov exp">EXPERTICE</div>
+        <div class="dim-track"><div class="dim-fill exp" style="width:61.5%"></div></div>
+        <div class="dim-score">6.15</div>
+      </div>
+      <div class="dim-diff">Máx. posible: <strong>10 pts</strong> · INTEC: partner oficial Tiendanube y 30+ años de trayectoria ERP</div>
+    </div>
+  </div>
+
+  <!-- DRIVERS -->
+  <div style="margin-bottom:10px">
+    <div class="section-label">Principales drivers de la diferencia</div>
+  </div>
+  <div class="drivers-wrap">
+    <div class="driver-list">
+      <div class="driver-list-title intec">▲ Top ítems a favor de INTEC</div>
+      <div class="driver-item">
+        <div class="driver-rank">#1</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Conexión Red Plataforma</div>
+          <div class="driver-mini-bar intec" style="width:88%"></div>
+        </div>
+        <div class="driver-delta intec">+1.84</div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-rank">#2</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Implementaciones comparables</div>
+          <div class="driver-mini-bar intec" style="width:72%"></div>
+        </div>
+        <div class="driver-delta intec">+1.50</div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-rank">#3</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Conectividad API Tiendanube</div>
+          <div class="driver-mini-bar intec" style="width:63%"></div>
+        </div>
+        <div class="driver-delta intec">+1.31</div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-rank">#4</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Gestión operativa de pedidos</div>
+          <div class="driver-mini-bar intec" style="width:60%"></div>
+        </div>
+        <div class="driver-delta intec">+1.26</div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-rank">#5</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Sincronización catálogo, precios y stock</div>
+          <div class="driver-mini-bar intec" style="width:58%"></div>
+        </div>
+        <div class="driver-delta intec">+1.23</div>
+      </div>
+      <div class="driver-item">
+        <div class="driver-rank">#6</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Consulta de stock físico en tiempo real</div>
+          <div class="driver-mini-bar intec" style="width:53%"></div>
+        </div>
+        <div class="driver-delta intec">+1.10</div>
+      </div>
+    </div>
+    <div class="driver-list">
+      <div class="driver-list-title exp">▲ Top ítems a favor de EXPERTICE</div>
+      <div class="driver-item">
+        <div class="driver-rank">#1</div>
+        <div class="driver-bar-wrap">
+          <div class="driver-name">Middleware y orquestación de datos</div>
+          <div class="driver-mini-bar exp" style="width:100%"></div>
+        </div>
+        <div class="driver-delta exp">+2.10</div>
+      </div>
+      <div style="padding: 14px 0 4px; font-size: 12.5px; color: var(--text3); line-height: 1.6;">
+        Es el único ítem donde EXPERTICE supera a INTEC de forma significativa. Su arquitectura de microservicios desacoplados mediante middleware moderno (Red Hat 3Scale) genera una ventaja real en flexibilidad tecnológica a largo plazo.
+        <br><br>
+        Los 4 ítems restantes donde ambos empatan (Conectividad LESET, Encriptación, Adaptabilidad, Capacitación) aportan 7.27% del total.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion">
+    <div class="conclusion-label">→ Conclusión ejecutiva parcial</div>
+    <div class="conclusion-text">
+      Con la información actualmente disponible, <strong>INTEC es el proveedor recomendado</strong>. Lidera en las tres dimensiones evaluadas, con una ventaja de <strong>+16.2 puntos sobre 70 posibles (+33%)</strong>. Su condición de desarrollador nativo del ERP Red Plataforma le otorga una ventaja estructural difícilmente reversible en los criterios de mayor peso individual de la evaluación. EXPERTICE presenta una ventaja real únicamente en Middleware y orquestación de datos (+2.10 pts), reflejando su fortaleza como consultora de arquitectura tecnológica moderna. <strong>Antes de la decisión final es imprescindible validar la dimensión Económica</strong>, que representa el 30% del peso total y podría modificar el resultado si la brecha de costos es muy significativa.
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  SECCIÓN 2 — ANÁLISIS POR ÍTEM                     -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s2" class="section">
+
+  <p class="section-label">Evaluación RFP · Detalle de criterios</p>
+  <h1 class="section-title">Análisis interactivo por ítem</h1>
+  <p class="section-sub">26 criterios evaluados. Filtrá, buscá y ordená para explorar cualquier requerimiento específico.</p>
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <div class="filter-label">Dimensión (Nivel 0)</div>
+      <select class="filter-select" id="f-dim" onchange="renderTable()">
+        <option value="">Todas las dimensiones</option>
+        <option>Funcional</option>
+        <option>Técnico</option>
+        <option>Proveedor</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Categoría (Nivel 1)</div>
+      <select class="filter-select" id="f-cat" onchange="renderTable()">
+        <option value="">Todas las categorías</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Ganador</div>
+      <select class="filter-select" id="f-winner" onchange="renderTable()">
+        <option value="">Todos</option>
+        <option>INTEC</option>
+        <option>EXPERTICE</option>
+        <option>Empate</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="filter-label">Buscar por keyword</div>
+      <input type="text" class="filter-input" id="f-search" placeholder="Ej: stock, API, factura…" oninput="renderTable()">
+    </div>
+  </div>
+
+  <div class="sort-bar">
+    <span class="sort-label">Ordenar por:</span>
+    <button class="sort-btn active" id="sort-peso" onclick="setSort('peso', this)">Peso individual ↓</button>
+    <button class="sort-btn" id="sort-diff" onclick="setSort('diff', this)">Mayor diferencia ↓</button>
+    <button class="sort-btn" id="sort-intec" onclick="setSort('intec', this)">Puntaje INTEC ↓</button>
+    <button class="sort-btn" id="sort-exp" onclick="setSort('exp', this)">Puntaje EXPERTICE ↓</button>
+  </div>
+
+  <div class="table-wrap">
+    <div class="table-count" id="table-count">Mostrando 26 de 26 ítems</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Ítem evaluado</th>
+          <th>Nivel 0</th>
+          <th>Nivel 1</th>
+          <th>Peso %</th>
+          <th>INTEC</th>
+          <th>Pts INTEC</th>
+          <th>EXPERTICE</th>
+          <th>Pts EXP</th>
+          <th>Δ puntos</th>
+          <th>Ganador</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!--  SECCIÓN 3 — INSIGHTS & RIESGOS                    -->
+<!-- ═══════════════════════════════════════════════════ -->
+<section id="s3" class="section">
+
+  <p class="section-label">Evaluación RFP · Análisis de fondo</p>
+  <h1 class="section-title">Insights & riesgos de la evaluación</h1>
+  <p class="section-sub">Concentración de la ventaja, estadísticas clave y puntos críticos de riesgo por proveedor.</p>
+
+  <!-- KPI INSIGHTS -->
+  <div class="insights-grid">
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot intec"></div>
+        <div class="insight-htitle">Ítems ganados por INTEC</div>
+      </div>
+      <div class="insight-big" style="color:var(--intec)">21</div>
+      <div class="insight-sub">de 26 ítems evaluados (80.8%). Gana en 8 de los 10 ítems de mayor peso. Solo pierde en Middleware y orquestación de datos.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot exp"></div>
+        <div class="insight-htitle">Único ítem ganado por EXPERTICE</div>
+      </div>
+      <div class="insight-big" style="color:var(--exp)">1</div>
+      <div class="insight-sub">Middleware y orquestación de datos (+2.10 pts). Refleja su fortaleza como consultora de arquitectura moderna con Red Hat 3Scale y microservicios desacoplados.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot neutral"></div>
+        <div class="insight-htitle">Ítems empatados</div>
+      </div>
+      <div class="insight-big" style="color:var(--tie)">4</div>
+      <div class="insight-sub">Conectividad API LESET, Encriptación, Adaptabilidad y Capacitación técnica. Representan el 7.27% del peso total evaluado. Ambos proveedores son equivalentes en estos criterios.</div>
+    </div>
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-dot warn"></div>
+        <div class="insight-htitle">Ítem de mayor peso individual</div>
+      </div>
+      <div class="insight-big" style="color:var(--warn)">7.35%</div>
+      <div class="insight-sub">Conexión Red Plataforma es el criterio más determinante. INTEC lo gana por 1.84 pts por ser el desarrollador nativo del ERP. Es el ítem que más define la evaluación.</div>
+    </div>
+  </div>
+
+  <!-- CONCENTRATION -->
+  <div class="full-width-card">
+    <div class="card-title">Concentración de la ventaja — ¿Cuántos ítems explican la diferencia?</div>
+    <div style="font-size:13px; color:var(--text2); margin-bottom:16px; line-height:1.6;">
+      La ventaja de INTEC (<strong style="color:#fff">+16.20 pts</strong>) no está distribuida de forma uniforme. Los <strong style="color:#fff">5 ítems de mayor diferencia</strong> explican <strong style="color:#fff">7.93 pts</strong> de esa ventaja, equivalente al <strong style="color:#fff">49%</strong> de la brecha total. Esto significa que la decisión es robusta: no depende de un único ítem, pero tampoco requiere que INTEC gane en todos para mantener la ventaja.
+    </div>
+    <div class="cat-chart">
+      <div class="conc-row">
+        <div class="conc-label" style="font-size:12px;color:var(--text2);font-weight:500">Top 1 ítem (Middleware EXP)</div>
+        <div class="conc-track" style="flex:1"><div class="conc-fill-exp" style="width:13%"></div></div>
+        <div class="conc-pct">−2.10 pts</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-label" style="font-size:12px;color:var(--text2);font-weight:500">Top 1 ítem INTEC (ERP)</div>
+        <div class="conc-track" style="flex:1"><div class="conc-fill-intec" style="width:11.3%"></div></div>
+        <div class="conc-pct">+1.84 pts</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-label" style="font-size:12px;color:var(--text2);font-weight:500">Top 5 ítems INTEC</div>
+        <div class="conc-track" style="flex:1"><div class="conc-fill-intec" style="width:49%"></div></div>
+        <div class="conc-pct">+7.93 pts</div>
+      </div>
+      <div class="conc-row">
+        <div class="conc-label" style="font-size:12px;color:var(--text2);font-weight:500">Ventaja total INTEC</div>
+        <div class="conc-track" style="flex:1"><div class="conc-fill-intec" style="width:100%"></div></div>
+        <div class="conc-pct">+16.20 pts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS + RISKS side by side -->
+  <div class="grid-2">
+
+    <div class="insight-card">
+      <div class="card-title">Estadísticas clave de la evaluación</div>
+      <div class="stat-list">
+        <div class="stat-row">
+          <div class="stat-key">Total ítems evaluados</div>
+          <div class="stat-val">26</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Dimensiones con datos</div>
+          <div class="stat-val">3 de 4</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Peso evaluado</div>
+          <div class="stat-val">70%</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Peso pendiente (Económico)</div>
+          <div class="stat-val" style="color:var(--warn)">30%</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítems con INTEC 100 pts</div>
+          <div class="stat-val">18</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítems donde EXPERTICE ≤40 pts</div>
+          <div class="stat-val" style="color:#fca5a5">6</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Categoría de mayor peso</div>
+          <div class="stat-val" style="font-size:11px">B. Integración ERP (35%×30%)</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-key">Ítem de mayor peso</div>
+          <div class="stat-val" style="font-size:11px">Conexión Red Plataforma (7.35%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="card-title">Análisis de riesgo por proveedor</div>
+      <div class="risk-list">
+        <div class="risk-item high">
+          <div class="risk-top">
+            <div class="risk-name">EXPERTICE · Gestión operativa de pedidos</div>
+            <div class="risk-badge high">Crítico</div>
+          </div>
+          <div class="risk-sub">Puntaje 40 (cumple parcialmente) en un ítem de peso 2.10%. Sin módulo preconfigurado de gestión de pedidos.</div>
+        </div>
+        <div class="risk-item high">
+          <div class="risk-top">
+            <div class="risk-name">EXPERTICE · Validación crédito/morosidad</div>
+            <div class="risk-badge high">Crítico</div>
+          </div>
+          <div class="risk-sub">Puntaje 40 en automatización clave para L'OVAL. Requiere desarrollo a medida sin motor financiero propio.</div>
+        </div>
+        <div class="risk-item med">
+          <div class="risk-top">
+            <div class="risk-name">EXPERTICE · Integración logística LESET</div>
+            <div class="risk-badge med">Moderado</div>
+          </div>
+          <div class="risk-sub">Los 3 ítems de logística obtuvieron puntaje 40, sin portal B2B de fábrica para trazabilidad de entregas.</div>
+        </div>
+        <div class="risk-item med">
+          <div class="risk-top">
+            <div class="risk-name">INTEC · Middleware y orquestación</div>
+            <div class="risk-badge med">Moderado</div>
+          </div>
+          <div class="risk-sub">Puntaje 40. Sin middleware independiente; integraciones acopladas al ERP propio. Riesgo de dependencia en integraciones futuras con terceros.</div>
+        </div>
+        <div class="risk-item low">
+          <div class="risk-top">
+            <div class="risk-name">INTEC · Documentación entregada</div>
+            <div class="risk-badge low">Bajo</div>
+          </div>
+          <div class="risk-sub">Puntaje 50 con evidencia parcial de documentación técnica. EXPERTICE obtuvo 0 pts en este criterio.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PENDING NOTE -->
+  <div class="alert-banner" style="margin-top:24px">
+    <div class="alert-icon">📋</div>
+    <div class="alert-body">
+      <div class="alert-title">¿Qué falta validar para completar la evaluación?</div>
+      <div class="alert-text">
+        La dimensión Económica concentra <strong>6 ítems pendientes</strong> con un peso combinado del 30%: Costos de integración y configuración (8.1%), Costos de desarrollo y automatizaciones (6.3%), Costos recurrentes de licenciamiento (4.8%), Costos de soporte y mantenimiento (4.2%), Costos de capacitación y puesta en marcha (3.6%), y Costos de actualización y evolución operativa (3.0%).
+        <br><br>
+        Para que EXPERTICE revierta el resultado actual necesitaría obtener <strong>al menos 54 puntos más</strong> que INTEC en la dimensión Económica sobre 30 posibles — lo que matemáticamente es imposible (el máximo diferencial en Económico es 30 pts si EXPERTICE obtuviera 100 en todo e INTEC obtuviera 0). La ventaja de INTEC es estructuralmente sólida, aunque la dimensión Económica podría reducir la brecha de forma significativa dependiendo de las propuestas de costo recibidas.
+      </div>
+    </div>
+  </div>
+
+</section>
+
+</main>
+
+<script>
+// ── DATA ─────────────────────────────────────────────
+const ITEMS = [
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Sincronización de catálogo, precios y stock","peso":4.9,"intec_pts":100,"exp_pts":75,"intec_final":4.9,"exp_final":3.675,"diff":1.225,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Experiencia de compra B2B","peso":3.5,"intec_pts":100,"exp_pts":75,"intec_final":3.5,"exp_final":2.625,"diff":0.875,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Gestión comercial mayorista","peso":3.5,"intec_pts":100,"exp_pts":75,"intec_final":3.5,"exp_final":2.625,"diff":0.875,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"A. Conexión con Tiendanube","item":"Gestión operativa de pedidos","peso":2.1,"intec_pts":100,"exp_pts":40,"intec_final":2.1,"exp_final":0.84,"diff":1.26,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"B. Integración con ERP Red Plataforma","item":"Conexión Red Plataforma","peso":7.35,"intec_pts":100,"exp_pts":75,"intec_final":7.35,"exp_final":5.5125,"diff":1.8375,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"B. Integración con ERP Red Plataforma","item":"Generación automática de factura en ERP","peso":3.15,"intec_pts":100,"exp_pts":75,"intec_final":3.15,"exp_final":2.3625,"diff":0.7875,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"C. Conexión con logística LESET","item":"Consulta de stock físico en tiempo real","peso":3.15,"intec_pts":75,"exp_pts":40,"intec_final":2.3625,"exp_final":1.26,"diff":1.1025,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"C. Conexión con logística LESET","item":"Notificación del estado de pedido a logística","peso":2.45,"intec_pts":75,"exp_pts":40,"intec_final":1.8375,"exp_final":0.98,"diff":0.8575,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"C. Conexión con logística LESET","item":"Actualización de estado de entrega (trazabilidad)","peso":1.4,"intec_pts":75,"exp_pts":40,"intec_final":1.05,"exp_final":0.56,"diff":0.49,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"D. Automatizaciones","item":"Validación automática de crédito/morosidad","peso":1.75,"intec_pts":100,"exp_pts":40,"intec_final":1.75,"exp_final":0.7,"diff":1.05,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"D. Automatizaciones","item":"Validación por pedido","peso":1.05,"intec_pts":100,"exp_pts":75,"intec_final":1.05,"exp_final":0.7875,"diff":0.2625,"winner":"INTEC"},
+  {"dim":"Funcional","cat":"D. Automatizaciones","item":"Configurar reglas de negocio propias","peso":0.7,"intec_pts":100,"exp_pts":75,"intec_final":0.7,"exp_final":0.525,"diff":0.175,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Conectividad y madurez de API con Tiendanube","peso":5.25,"intec_pts":100,"exp_pts":75,"intec_final":5.25,"exp_final":3.9375,"diff":1.3125,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Conectividad nativa con ERP Red Plataforma","peso":4.375,"intec_pts":100,"exp_pts":75,"intec_final":4.375,"exp_final":3.2812,"diff":1.0938,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Conectividad y flexibilidad de API con LESET","peso":2.625,"intec_pts":75,"exp_pts":75,"intec_final":1.9688,"exp_final":1.9688,"diff":0.0,"winner":"Empate"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Middleware y orquestación de datos","peso":3.5,"intec_pts":40,"exp_pts":100,"intec_final":1.4,"exp_final":3.5,"diff":-2.1,"winner":"EXPERTICE"},
+  {"dim":"Técnico","cat":"A. Integración y APIs","item":"Velocidad de sincronización","peso":1.75,"intec_pts":100,"exp_pts":75,"intec_final":1.75,"exp_final":1.3125,"diff":0.4375,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"B. Confidencialidad, Integridad y Disponibilidad","item":"Protocolos de encriptación para datos sensibles","peso":2.25,"intec_pts":100,"exp_pts":100,"intec_final":2.25,"exp_final":2.25,"diff":0.0,"winner":"Empate"},
+  {"dim":"Técnico","cat":"B. Confidencialidad, Integridad y Disponibilidad","item":"Mecanismos de backup automático","peso":4.125,"intec_pts":100,"exp_pts":75,"intec_final":4.125,"exp_final":3.0938,"diff":1.0312,"winner":"INTEC"},
+  {"dim":"Técnico","cat":"B. Confidencialidad, Integridad y Disponibilidad","item":"Gestión de accesos y permisos por rol","peso":1.125,"intec_pts":100,"exp_pts":75,"intec_final":1.125,"exp_final":0.8438,"diff":0.2812,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"A. Experiencia y Trayectoria","item":"Implementaciones comparables","peso":3.0,"intec_pts":100,"exp_pts":50,"intec_final":3.0,"exp_final":1.5,"diff":1.5,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"A. Experiencia y Trayectoria","item":"Certificaciones (partner oficial Tiendanube)","peso":1.8,"intec_pts":100,"exp_pts":75,"intec_final":1.8,"exp_final":1.35,"diff":0.45,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"A. Experiencia y Trayectoria","item":"Adaptabilidad y escalabilidad","peso":1.2,"intec_pts":100,"exp_pts":100,"intec_final":1.2,"exp_final":1.2,"diff":0.0,"winner":"Empate"},
+  {"dim":"Proveedor","cat":"B. Soporte y Servicio","item":"SLA y tiempos de respuesta","peso":1.8,"intec_pts":100,"exp_pts":50,"intec_final":1.8,"exp_final":0.9,"diff":0.9,"winner":"INTEC"},
+  {"dim":"Proveedor","cat":"B. Soporte y Servicio","item":"Capacitación técnica","peso":1.2,"intec_pts":100,"exp_pts":100,"intec_final":1.2,"exp_final":1.2,"diff":0.0,"winner":"Empate"},
+  {"dim":"Proveedor","cat":"B. Soporte y Servicio","item":"Documentación entregada","peso":1.0,"intec_pts":50,"exp_pts":0,"intec_final":0.5,"exp_final":0.0,"diff":0.5,"winner":"INTEC"}
+];
+
+// ── STATE ────────────────────────────────────────────
+let sortKey = 'peso';
+
+// ── NAV ──────────────────────────────────────────────
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  if (id === 's2') populateCatFilter();
+}
+
+// ── FILTER + TABLE ───────────────────────────────────
+function populateCatFilter() {
+  const dim = document.getElementById('f-dim').value;
+  const cats = [...new Set(ITEMS.filter(i => !dim || i.dim === dim).map(i => i.cat))];
+  const sel = document.getElementById('f-cat');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Todas las categorías</option>';
+  cats.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    if (c === prev) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+document.getElementById('f-dim').addEventListener('change', () => {
+  populateCatFilter();
+  renderTable();
+});
+
+function setSort(key, el) {
+  sortKey = key;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function ptsClass(v) {
+  if (v === 100) return 'pts-100';
+  if (v === 75)  return 'pts-75';
+  if (v === 50)  return 'pts-50';
+  if (v === 40)  return 'pts-40';
+  return 'pts-0';
+}
+
+function renderTable() {
+  const dim    = document.getElementById('f-dim').value;
+  const cat    = document.getElementById('f-cat').value;
+  const winner = document.getElementById('f-winner').value;
+  const search = document.getElementById('f-search').value.toLowerCase().trim();
+
+  let data = ITEMS.filter(i => {
+    if (dim    && i.dim    !== dim)                           return false;
+    if (cat    && i.cat    !== cat)                           return false;
+    if (winner && i.winner !== winner)                        return false;
+    if (search && !i.item.toLowerCase().includes(search) &&
+                  !i.cat.toLowerCase().includes(search) &&
+                  !i.dim.toLowerCase().includes(search))      return false;
+    return true;
+  });
+
+  // sort
+  data.sort((a, b) => {
+    if (sortKey === 'peso')  return b.peso - a.peso;
+    if (sortKey === 'diff')  return Math.abs(b.diff) - Math.abs(a.diff);
+    if (sortKey === 'intec') return b.intec_pts - a.intec_pts;
+    if (sortKey === 'exp')   return b.exp_pts - a.exp_pts;
+  });
+
+  document.getElementById('table-count').textContent =
+    `Mostrando ${data.length} de ${ITEMS.length} ítems`;
+
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = data.map(i => {
+    const diffClass = i.diff > 0 ? 'td-diff-pos' : i.diff < 0 ? 'td-diff-neg' : 'td-diff-zero';
+    const diffStr   = i.diff > 0 ? `+${i.diff.toFixed(2)}` : i.diff === 0 ? '—' : i.diff.toFixed(2);
+    const intecF    = i.intec_final.toFixed(2);
+    const expF      = i.exp_final.toFixed(2);
+    return `
+      <tr>
+        <td style="max-width:220px;white-space:normal;line-height:1.4">${i.item}</td>
+        <td><span class="td-dim ${i.dim}">${i.dim}</span></td>
+        <td class="td-cat">${i.cat}</td>
+        <td class="td-peso"><strong>${i.peso.toFixed(2)}%</strong></td>
+        <td><span class="pts-chip ${ptsClass(i.intec_pts)}">${i.intec_pts}</span></td>
+        <td class="td-final">${intecF}</td>
+        <td><span class="pts-chip ${ptsClass(i.exp_pts)}">${i.exp_pts}</span></td>
+        <td class="td-final">${expF}</td>
+        <td class="${diffClass}">${diffStr}</td>
+        <td><span class="winner-chip ${i.winner}">${i.winner}</span></td>
+      </tr>`;
+  }).join('');
+}
+
+// ── INIT ─────────────────────────────────────────────
+populateCatFilter();
+renderTable();
+</script>
+</body>
+</html>
