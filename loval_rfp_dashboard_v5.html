@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'OVAL · RFP 2026 · Evaluación de Proveedores</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg:      #0b0f15;
+  --s1:      #111720;
+  --s2:      #171e28;
+  --border:  #1e2d3d;
+  --border2: #2a3a4d;
+  --intec:   #3b82f6;
+  --intec2:  #1d4ed8;
+  --intec-a: rgba(59,130,246,0.10);
+  --exp:     #10b981;
+  --exp2:    #059669;
+  --exp-a:   rgba(16,185,129,0.10);
+  --tie:     #8b5cf6;
+  --warn:    #f59e0b;
+  --text:    #e2e8f0;
+  --text2:   #94a3b8;
+  --text3:   #4b5d6f;
+  --white:   #ffffff;
+  --r:       10px;
+  --r2:      6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#login-screen.hidden{display:none}
+.login-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 30% 30%,rgba(59,130,246,0.06) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 75% 70%,rgba(16,185,129,0.04) 0%,transparent 55%);pointer-events:none}
+.login-box{position:relative;background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:44px 48px;width:400px;max-width:92vw;box-shadow:0 24px 60px rgba(0,0,0,0.5)}
+.login-logo{font-size:30px;font-weight:800;letter-spacing:.08em;color:var(--white);text-align:center;margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--text3);text-align:center;margin-bottom:32px;letter-spacing:.05em}
+.login-label{display:block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.login-input{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);font-size:14px;padding:10px 13px;outline:none;transition:border-color .2s;margin-bottom:14px}
+.login-input:focus{border-color:var(--intec)}
+.login-btn{width:100%;background:var(--intec);border:none;border-radius:var(--r2);color:#fff;font-size:14px;font-weight:600;padding:11px;cursor:pointer;margin-top:4px;letter-spacing:.03em;transition:background .2s}
+.login-btn:hover{background:var(--intec2)}
+.login-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:6px;color:#fca5a5;font-size:12px;padding:9px 13px;margin-top:10px;display:none}
+.login-err.show{display:block}
+
+/* ── LAYOUT ── */
+#app{display:none}
+#app.visible{display:block}
+
+.header{background:var(--s1);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:100}
+.h-brand{font-size:18px;font-weight:800;letter-spacing:.06em;color:var(--white)}
+.h-sep{width:1px;height:18px;background:var(--border2);margin:0 12px}
+.h-sub{color:var(--text3);font-size:12px}
+.h-right{display:flex;align-items:center;gap:10px}
+.logout-btn{background:var(--s2);border:1px solid var(--border2);border-radius:6px;color:var(--text3);font-size:12px;padding:5px 11px;cursor:pointer;transition:all .15s}
+.logout-btn:hover{border-color:#ef4444;color:#fca5a5}
+
+.nav{background:var(--s1);border-bottom:1px solid var(--border);display:flex;padding:0 32px}
+.nav-btn{padding:13px 18px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;user-select:none}
+.nav-btn:hover{color:var(--text2)}
+.nav-btn.active{color:var(--text);border-bottom-color:var(--intec)}
+
+.main{max-width:1280px;margin:0 auto;padding:28px 32px 60px}
+.section{display:none;animation:fadeIn .25s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── TYPOGRAPHY ── */
+.sec-tag{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--intec);margin-bottom:5px}
+.sec-title{font-size:24px;font-weight:700;color:var(--white);margin-bottom:4px}
+.sec-sub{font-size:13px;color:var(--text3);margin-bottom:24px}
+
+/* ── CARDS / GRID ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;gap:12px;margin-bottom:24px}
+.kpi{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;position:relative;overflow:hidden}
+.kpi.winner-card{border-color:rgba(59,130,246,.35);background:linear-gradient(135deg,rgba(59,130,246,.07) 0%,var(--s1) 60%)}
+.kpi-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.kpi-val{font-size:30px;font-weight:800;color:var(--white);line-height:1}
+.kpi-val.intec{color:var(--intec)}
+.kpi-val.exp{color:var(--exp)}
+.kpi-val.diff{color:var(--white)}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.winner-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:var(--intec);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-top:6px}
+.kpi-bar{height:3px;background:var(--border);border-radius:2px;margin-top:12px;overflow:hidden}
+.kpi-bar-fill{height:100%;border-radius:2px}
+
+/* ── CHART WRAPPERS ── */
+.chart-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.chart-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+.chart-wrap{position:relative}
+
+/* S1 layout */
+.s1-row1{margin-bottom:14px}
+.s1-row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.s1-row3{display:grid;grid-template-columns:1fr;gap:14px}
+
+/* ── FILTERS (S2) ── */
+.filters-bar{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-label{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3)}
+.filter-select,.filter-input{background:var(--bg);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);font-size:13px;padding:7px 11px;outline:none;transition:border-color .2s;min-width:140px}
+.filter-select:focus,.filter-input:focus{border-color:var(--intec)}
+.filter-input{min-width:180px}
+option{background:#1a2332}
+
+/* ── S2 CHARTS ── */
+.s2-charts{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:18px}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.table-meta{padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-count{font-size:12px;color:var(--text3)}
+.sort-bar{display:flex;gap:6px}
+.sort-btn{background:var(--s2);border:1px solid var(--border2);border-radius:5px;color:var(--text3);font-size:11px;padding:4px 10px;cursor:pointer;transition:all .15s}
+.sort-btn:hover,.sort-btn.active{border-color:var(--intec);color:var(--intec);background:var(--intec-a)}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--s2);padding:9px 12px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+thead th:first-child{padding-left:16px}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(59,130,246,.04)}
+tbody td{padding:9px 12px;font-size:12.5px;color:var(--text2);vertical-align:middle}
+tbody td:first-child{padding-left:16px;color:var(--text);font-size:13px}
+.chip{display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:4px;padding:2px 7px;min-width:32px}
+.chip.p100{background:rgba(16,185,129,.14);color:#34d399}
+.chip.p75{background:rgba(59,130,246,.12);color:#93c5fd}
+.chip.p50{background:rgba(245,158,11,.12);color:#fcd34d}
+.chip.p40{background:rgba(239,68,68,.12);color:#fca5a5}
+.chip.p0{background:rgba(107,114,128,.12);color:#6b7280}
+.dim-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:4px}
+.dim-tag.FUNCIONAL{color:#f97316;background:rgba(249,115,22,.1)}
+.dim-tag.TÉCNICO,.dim-tag.TECNICO{color:#a78bfa;background:rgba(167,139,250,.1)}
+.dim-tag.PROVEEDOR{color:#67e8f9;background:rgba(103,232,249,.1)}
+.dim-tag.ECONOMICO{color:#f59e0b;background:rgba(245,158,11,.1)}
+.diff-pos{color:var(--intec);font-weight:600}
+.diff-neg{color:var(--exp);font-weight:600}
+.diff-zer{color:var(--tie)}
+.w-intec{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--intec-a);color:var(--intec);border:1px solid rgba(59,130,246,.2)}
+.w-exp{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--exp-a);color:var(--exp);border:1px solid rgba(16,185,129,.2)}
+.w-tie{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(139,92,246,.1);color:var(--tie);border:1px solid rgba(139,92,246,.2)}
+
+/* ── SUNBURST-LIKE LEGEND ── */
+.pond-legend{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.pl-dim{margin-bottom:4px}
+.pl-dim-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.pl-items{display:flex;flex-direction:column;gap:5px;padding-left:12px}
+.pl-item-row{display:flex;align-items:center;gap:8px}
+.pl-bar-wrap{flex:1;background:var(--bg);height:10px;border-radius:4px;overflow:hidden}
+.pl-bar-fill{height:100%;border-radius:4px}
+.pl-item-name{font-size:12px;color:var(--text3);width:200px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl-item-pct{font-size:11px;color:var(--text2);width:36px;text-align:right;flex-shrink:0}
+
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}.s1-row2,.s1-row3,.s2-charts,.g2,.g3,.g4{grid-template-columns:1fr}
+  .main{padding:16px 14px 40px}.header{padding:0 14px}.nav{padding:0 14px}
+  .filter-select,.filter-input{min-width:unset;width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-glow"></div>
+  <div class="login-box">
+    <div class="login-logo">L'OVAL</div>
+    <div class="login-sub">Evaluación de Proveedores · RFP 2026</div>
+    <label class="login-label">Usuario</label>
+    <input id="lu" class="login-input" type="text" placeholder="Usuario" autocomplete="username">
+    <label class="login-label">Contraseña</label>
+    <input id="lp" class="login-input" type="password" placeholder="••••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Ingresar →</button>
+    <div class="login-err" id="lerr">Usuario o contraseña incorrectos.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header class="header">
+    <div style="display:flex;align-items:center">
+      <div class="h-brand">L'OVAL</div>
+      <div class="h-sep"></div>
+      <div class="h-sub">Evaluación RFP 2026 · INTEC vs. EXPERTICE</div>
+    </div>
+    <div class="h-right">
+      <span style="font-size:11px;color:var(--text3)">Mayo 2026</span>
+      <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="nav-btn active" onclick="showTab('s1',this)">Resultado ejecutivo</div>
+    <div class="nav-btn" onclick="showTab('s2',this)">Explorador de criterios</div>
+  </nav>
+
+  <main class="main">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- S1 — RESULTADO EJECUTIVO               -->
+    <!-- ═══════════════════════════════════════ -->
+    <section id="s1" class="section active">
+      <div class="sec-tag">Resultado · RFP ponderada</div>
+      <div class="sec-title">Evaluación comparativa de proveedores</div>
+      <div class="sec-sub">31 criterios evaluados en 4 dimensiones · puntaje sobre 100 pts ponderados</div>
+
+      <!-- KPI ROW -->
+      <div class="kpi-grid" id="kpi-row"></div>
+
+      <!-- ROW 2: Barras totales + Barras por dimensión -->
+      <div class="s1-row2">
+        <div class="chart-card">
+          <div class="chart-title">Puntaje total ponderado</div>
+          <div class="chart-wrap" style="height:160px"><canvas id="chart-total"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Resultado por dimensión</div>
+          <div class="chart-wrap" style="height:160px"><canvas id="chart-dims"></canvas></div>
+        </div>
+      </div>
+
+      <!-- ROW 3: Top drivers + Ponderación -->
+      <div class="s1-row3">
+        <div class="chart-card">
+          <div class="chart-title">Top drivers de diferencia — ítems de mayor impacto</div>
+          <div class="chart-wrap" style="height:420px"><canvas id="chart-drivers"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Estructura de ponderación — Nivel 0 › Nivel 1 › Ítem</div>
+          <div style="padding-right:4px" id="pond-viz"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- S2 — EXPLORADOR DE CRITERIOS           -->
+    <!-- ═══════════════════════════════════════ -->
+    <section id="s2" class="section">
+      <div class="sec-tag">Explorador</div>
+      <div class="sec-title">Criterios de evaluación</div>
+      <div class="sec-sub">Filtrá y explorá los 31 ítems de la matriz RFP ponderada</div>
+
+      <!-- FILTERS -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <div class="filter-label">Dimensión</div>
+          <select class="filter-select" id="fd" onchange="onDimChange()">
+            <option value="">Todas</option>
+            <option>FUNCIONAL</option><option>TÉCNICO</option><option>PROVEEDOR</option><option>ECONOMICO</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Categoría</div>
+          <select class="filter-select" id="fc" onchange="renderS2()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Ganador</div>
+          <select class="filter-select" id="fw" onchange="renderS2()">
+            <option value="">Todos</option>
+            <option>INTEC</option><option>EXPERTICE</option><option>Empate</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Buscar</div>
+          <input class="filter-input" id="fs" type="text" placeholder="Ej: stock, API, costos…" oninput="renderS2()">
+        </div>
+      </div>
+
+      <!-- MINI CHARTS -->
+      <div class="s2-charts">
+        <!-- Mini total: compact horizontal bar -->
+        <div class="chart-card" style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px;padding:16px 20px">
+          <div>
+            <div class="chart-title" style="margin-bottom:10px">Comparación acumulada del filtro</div>
+            <div class="chart-wrap" style="height:70px"><canvas id="chart-s2-total"></canvas></div>
+          </div>
+          <div id="s2-diff-label" style="font-size:22px;font-weight:800;white-space:nowrap;text-align:right;min-width:120px"></div>
+        </div>
+        <!-- Item chart: full-width, tall -->
+        <div class="chart-card">
+          <div class="chart-title">Puntaje final por ítem (ítems visibles con el filtro activo)</div>
+          <div class="chart-wrap" style="height:460px"><canvas id="chart-s2-items"></canvas></div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="table-meta">
+          <span class="table-count" id="tcount">31 ítems</span>
+          <div class="sort-bar">
+            <span style="font-size:11px;color:var(--text3);margin-right:2px">Ordenar:</span>
+            <button class="sort-btn active" id="sb-peso" onclick="setSort('peso',this)">Peso ↓</button>
+            <button class="sort-btn" id="sb-diff" onclick="setSort('diff',this)">Diferencia ↓</button>
+            <button class="sort-btn" id="sb-intec" onclick="setSort('intec',this)">INTEC ↓</button>
+            <button class="sort-btn" id="sb-exp" onclick="setSort('exp',this)">EXP ↓</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Ítem evaluado</th>
+              <th>Dimensión</th>
+              <th>Categoría</th>
+              <th>Peso %</th>
+              <th style="text-align:center">Pts INTEC</th>
+              <th style="text-align:center;color:var(--intec)">Final INTEC</th>
+              <th style="text-align:center">Pts EXP</th>
+              <th style="text-align:center;color:var(--exp)">Final EXP</th>
+              <th style="text-align:center">Δ</th>
+              <th>Ganador</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA — from Excel PONDERACIÓN + COMPARACIÓN sheets
+// ═══════════════════════════════════════════════════
+const DATA = [
+  // FUNCIONAL · A. Conexión con Tiendanube (cat weight 0.4 of dim 0.35)
+  {dim:"FUNCIONAL",cat:"A. Conexión con Tiendanube",item:"Sincronización de catálogo, precios y stock",peso:4.9,i_pts:100,e_pts:75,i_final:4.9,e_final:3.675},
+  {dim:"FUNCIONAL",cat:"A. Conexión con Tiendanube",item:"Experiencia de compra B2B",peso:3.5,i_pts:100,e_pts:75,i_final:3.5,e_final:2.625},
+  {dim:"FUNCIONAL",cat:"A. Conexión con Tiendanube",item:"Gestión comercial mayorista",peso:3.5,i_pts:100,e_pts:75,i_final:3.5,e_final:2.625},
+  {dim:"FUNCIONAL",cat:"A. Conexión con Tiendanube",item:"Gestión operativa de pedidos",peso:2.1,i_pts:100,e_pts:40,i_final:2.1,e_final:0.84},
+  // FUNCIONAL · B. Integración ERP
+  {dim:"FUNCIONAL",cat:"B. Integración con ERP Red Plataforma",item:"Conexión Red Plataforma",peso:7.35,i_pts:100,e_pts:75,i_final:7.35,e_final:5.5125},
+  {dim:"FUNCIONAL",cat:"B. Integración con ERP Red Plataforma",item:"Generación automática de factura en ERP",peso:3.15,i_pts:100,e_pts:75,i_final:3.15,e_final:2.3625},
+  // FUNCIONAL · C. LESET
+  {dim:"FUNCIONAL",cat:"C. Conexión con logística LESET",item:"Consulta de stock físico en tiempo real",peso:3.15,i_pts:75,e_pts:40,i_final:2.3625,e_final:1.26},
+  {dim:"FUNCIONAL",cat:"C. Conexión con logística LESET",item:"Notificación del estado de pedido a la logística",peso:2.45,i_pts:75,e_pts:40,i_final:1.8375,e_final:0.98},
+  {dim:"FUNCIONAL",cat:"C. Conexión con logística LESET",item:"Actualización de estado de entrega (trazabilidad)",peso:1.4,i_pts:75,e_pts:40,i_final:1.05,e_final:0.56},
+  // FUNCIONAL · D. Automatizaciones
+  {dim:"FUNCIONAL",cat:"D. Automatizaciones",item:"Validación automática de crédito/morosidad",peso:1.75,i_pts:100,e_pts:40,i_final:1.75,e_final:0.7},
+  {dim:"FUNCIONAL",cat:"D. Automatizaciones",item:"Validación por pedido",peso:1.05,i_pts:100,e_pts:75,i_final:1.05,e_final:0.7875},
+  {dim:"FUNCIONAL",cat:"D. Automatizaciones",item:"Configurar reglas de negocio propias",peso:0.7,i_pts:100,e_pts:75,i_final:0.7,e_final:0.525},
+  // TÉCNICO · A. APIs
+  {dim:"TÉCNICO",cat:"A. Integración y APIs",item:"Conectividad y madurez de API con Tiendanube",peso:5.25,i_pts:100,e_pts:75,i_final:5.25,e_final:3.9375},
+  {dim:"TÉCNICO",cat:"A. Integración y APIs",item:"Conectividad nativa con ERP Red Plataforma",peso:4.375,i_pts:100,e_pts:75,i_final:4.375,e_final:3.28125},
+  {dim:"TÉCNICO",cat:"A. Integración y APIs",item:"Conectividad y flexibilidad de API con LESET",peso:2.625,i_pts:75,e_pts:75,i_final:1.96875,e_final:1.96875},
+  {dim:"TÉCNICO",cat:"A. Integración y APIs",item:"Middleware y orquestación de datos",peso:3.5,i_pts:40,e_pts:100,i_final:1.4,e_final:3.5},
+  {dim:"TÉCNICO",cat:"A. Integración y APIs",item:"Velocidad de sincronización",peso:1.75,i_pts:100,e_pts:75,i_final:1.75,e_final:1.3125},
+  // TÉCNICO · B. CID
+  {dim:"TÉCNICO",cat:"B. Confidencialidad, Integridad y Disponibilidad",item:"Protocolos de encriptación",peso:2.25,i_pts:100,e_pts:100,i_final:2.25,e_final:2.25},
+  {dim:"TÉCNICO",cat:"B. Confidencialidad, Integridad y Disponibilidad",item:"Mecanismos de backup automático",peso:4.125,i_pts:100,e_pts:75,i_final:4.125,e_final:3.09375},
+  {dim:"TÉCNICO",cat:"B. Confidencialidad, Integridad y Disponibilidad",item:"Gestión de accesos y permisos por rol",peso:1.125,i_pts:100,e_pts:75,i_final:1.125,e_final:0.84375},
+  // PROVEEDOR · A. Experiencia
+  {dim:"PROVEEDOR",cat:"A. Experiencia y Trayectoria",item:"Implementaciones",peso:3.0,i_pts:100,e_pts:50,i_final:3.0,e_final:1.5},
+  {dim:"PROVEEDOR",cat:"A. Experiencia y Trayectoria",item:"Certificaciones (partner Tiendanube)",peso:1.8,i_pts:100,e_pts:75,i_final:1.8,e_final:1.35},
+  {dim:"PROVEEDOR",cat:"A. Experiencia y Trayectoria",item:"Adaptabilidad y escalabilidad",peso:1.2,i_pts:100,e_pts:100,i_final:1.2,e_final:1.2},
+  // PROVEEDOR · B. Soporte
+  {dim:"PROVEEDOR",cat:"B. Soporte y Servicio",item:"SLA y tiempos de respuesta",peso:1.8,i_pts:100,e_pts:50,i_final:1.8,e_final:0.9},
+  {dim:"PROVEEDOR",cat:"B. Soporte y Servicio",item:"Capacitación",peso:1.2,i_pts:100,e_pts:100,i_final:1.2,e_final:1.2},
+  {dim:"PROVEEDOR",cat:"B. Soporte y Servicio",item:"Documentación",peso:1.0,i_pts:50,e_pts:0,i_final:0.5,e_final:0.0},
+  // ECONOMICO · A. Adquisición
+  {dim:"ECONOMICO",cat:"A. Costos de Adquisición e Implementación",item:"Costos de integración y configuración",peso:10.8,i_pts:75,e_pts:40,i_final:8.1,e_final:4.32},
+  {dim:"ECONOMICO",cat:"A. Costos de Adquisición e Implementación",item:"Costos de desarrollo y automatizaciones",peso:4.5,i_pts:75,e_pts:75,i_final:3.375,e_final:3.375},
+  {dim:"ECONOMICO",cat:"A. Costos de Adquisición e Implementación",item:"Costos de capacitación y puesta en marcha",peso:2.7,i_pts:100,e_pts:100,i_final:2.7,e_final:2.7},
+  // ECONOMICO · B. Recurrentes
+  {dim:"ECONOMICO",cat:"B. Costos recurrentes y mantenimiento",item:"Costos de licenciamiento o suscripción",peso:7.2,i_pts:75,e_pts:75,i_final:5.4,e_final:5.4},
+  {dim:"ECONOMICO",cat:"B. Costos recurrentes y mantenimiento",item:"Costos de soporte y mantenimiento",peso:4.8,i_pts:40,e_pts:75,i_final:1.92,e_final:3.6},
+];
+
+// Compute winner per item
+DATA.forEach(d => {
+  const diff = +(d.i_final - d.e_final).toFixed(4);
+  d.diff = diff;
+  d.winner = diff > 0.0005 ? 'INTEC' : diff < -0.0005 ? 'EXPERTICE' : 'Empate';
+});
+
+// Dimension totals
+const DIMS = ['FUNCIONAL','TÉCNICO','PROVEEDOR','ECONOMICO'];
+const DIM_LABELS = {FUNCIONAL:'Funcional',TÉCNICO:'Técnico',PROVEEDOR:'Proveedor',ECONOMICO:'Económico'};
+const DIM_COLOR = {FUNCIONAL:'#f97316',TÉCNICO:'#a78bfa',PROVEEDOR:'#67e8f9',ECONOMICO:'#f59e0b'};
+const DIM_WEIGHTS = {FUNCIONAL:35,TÉCNICO:25,PROVEEDOR:10,ECONOMICO:30};
+
+function dimTotals(data) {
+  const out = {};
+  DIMS.forEach(d => out[d] = {i:0,e:0});
+  data.forEach(r => { out[r.dim].i += r.i_final; out[r.dim].e += r.e_final; });
+  DIMS.forEach(d => { out[d].i = +out[d].i.toFixed(3); out[d].e = +out[d].e.toFixed(3); });
+  return out;
+}
+
+const TOTAL_INTEC = +DATA.reduce((s,d) => s+d.i_final,0).toFixed(3);
+const TOTAL_EXP   = +DATA.reduce((s,d) => s+d.e_final,0).toFixed(3);
+const TOTAL_DIFF  = +(TOTAL_INTEC - TOTAL_EXP).toFixed(3);
+const DIM_T = dimTotals(DATA);
+
+// ── AUTH ────────────────────────────────────────────
+const CREDS = {u:'APLSI', p:'GRUPO5LOVAL'};
+function doLogin() {
+  const u = document.getElementById('lu').value.trim();
+  const p = document.getElementById('lp').value;
+  const err = document.getElementById('lerr');
+  if (u === CREDS.u && p === CREDS.p) {
+    localStorage.setItem('loval_ok','1');
+    err.classList.remove('show');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+    initDashboard();
+  } else {
+    err.classList.add('show');
+    document.getElementById('lp').value = '';
+  }
+}
+function doLogout() {
+  localStorage.removeItem('loval_ok');
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('lu').value = '';
+  document.getElementById('lp').value = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Enter' && !document.getElementById('login-screen').classList.contains('hidden')) doLogin(); });
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('loval_ok')==='1') {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+    initDashboard();
+  }
+});
+
+// ── NAV ─────────────────────────────────────────────
+function showTab(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  if (id === 's2') { populateCats(); renderS2(); }
+}
+
+// ── CHART HELPERS ────────────────────────────────────
+const INTEC_C  = '#3b82f6';
+const EXP_C    = '#10b981';
+const INTEC_A  = 'rgba(59,130,246,0.12)';
+const EXP_A    = 'rgba(16,185,129,0.12)';
+const AXIS_C   = '#2a3a4d';
+const LABEL_C  = '#64748b';
+const chartDefaults = {
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e2d3d',titleColor:'#e2e8f0',bodyColor:'#94a3b8',borderColor:'#2a3a4d',borderWidth:1,padding:10,cornerRadius:6}},
+  scales:{x:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:11}}},y:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:11}}}}
+};
+function baseOpts(extra={}) {
+  return {responsive:true,maintainAspectRatio:false,...chartDefaults,...extra,plugins:{...chartDefaults.plugins,...(extra.plugins||{})},scales:{...chartDefaults.scales,...(extra.scales||{})}};
+}
+
+let charts = {};
+function destroyChart(id) { if(charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+// ── CHIP / BADGE HELPERS ─────────────────────────────
+function ptsChip(v) {
+  const cls = v===100?'p100':v===75?'p75':v===50?'p50':v===40?'p40':'p0';
+  return `<span class="chip ${cls}">${v}</span>`;
+}
+function winnerBadge(w) {
+  const cls = w==='INTEC'?'w-intec':w==='EXPERTICE'?'w-exp':'w-tie';
+  return `<span class="${cls}">${w}</span>`;
+}
+function diffFmt(d) {
+  if (Math.abs(d)<0.001) return `<span class="diff-zer">=</span>`;
+  const cls = d>0?'diff-pos':'diff-neg';
+  const sign = d>0?'+':'';
+  return `<span class="${cls}">${sign}${d.toFixed(2)}</span>`;
+}
+
+// ── INIT ─────────────────────────────────────────────
+function initDashboard() {
+  renderKPIs();
+  renderChartTotal();
+  renderChartDims();
+  renderChartDrivers();
+  renderPondViz();
+}
+
+// ── KPI CARDS ────────────────────────────────────────
+function renderKPIs() {
+  const intecDims = DIMS.filter(d => DIM_T[d].i > DIM_T[d].e).length;
+  const expDims   = DIMS.filter(d => DIM_T[d].e > DIM_T[d].i).length;
+  const iPct = +(TOTAL_INTEC).toFixed(1);
+  const ePct = +(TOTAL_EXP).toFixed(1);
+
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi winner-card">
+      <div class="kpi-label">Proveedor recomendado</div>
+      <div class="kpi-val" style="font-size:26px;color:var(--white)">INTEC</div>
+      <div class="winner-pill">▲ Mayor puntaje total</div>
+      <div class="kpi-sub" style="margin-top:8px">Gana en 3 de 4 dimensiones</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Puntaje INTEC</div>
+      <div class="kpi-val intec">${iPct}<span style="font-size:14px;font-weight:400;color:var(--text3)"> /100</span></div>
+      <div class="kpi-sub">${DIMS.filter(d=>DIM_T[d].i>DIM_T[d].e).length} dim. ganadas · ${DATA.filter(d=>d.winner==='INTEC').length} ítems</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${iPct}%;background:var(--intec)"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Puntaje EXPERTICE</div>
+      <div class="kpi-val exp">${ePct}<span style="font-size:14px;font-weight:400;color:var(--text3)"> /100</span></div>
+      <div class="kpi-sub">${DIMS.filter(d=>DIM_T[d].e>DIM_T[d].i).length} dim. ganadas · ${DATA.filter(d=>d.winner==='EXPERTICE').length} ítems</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${ePct}%;background:var(--exp)"></div></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Diferencia total</div>
+      <div class="kpi-val diff">+${TOTAL_DIFF.toFixed(1)}</div>
+      <div class="kpi-sub">pts a favor de INTEC · ${((TOTAL_DIFF/TOTAL_EXP)*100).toFixed(0)}% por encima</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Ítems evaluados</div>
+      <div class="kpi-val diff" style="font-size:28px">${DATA.length}</div>
+      <div class="kpi-sub">4 dimensiones · ${[...new Set(DATA.map(d=>d.cat))].length} categorías</div>
+      <div class="kpi-sub" style="margin-top:4px">${DATA.filter(d=>d.winner==='Empate').length} empates · ${DATA.filter(d=>d.winner==='EXPERTICE').length} EXP lidera</div>
+    </div>`;
+}
+
+// ── CHART: TOTAL ─────────────────────────────────────
+function renderChartTotal() {
+  destroyChart('total');
+  const ctx = document.getElementById('chart-total').getContext('2d');
+  charts['total'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['INTEC','EXPERTICE'],
+      datasets: [{
+        data: [TOTAL_INTEC, TOTAL_EXP],
+        backgroundColor: [INTEC_C, EXP_C],
+        borderRadius: 6, borderSkipped: false,
+      }]
+    },
+    options: baseOpts({
+      indexAxis:'y',
+      plugins:{...chartDefaults.plugins,
+        datalabels:{display:false},
+        tooltip:{callbacks:{label: c => ` ${c.raw.toFixed(2)} pts`}}
+      },
+      scales:{
+        x:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:11}},min:0,max:100,
+          title:{display:true,text:'Puntaje ponderado / 100',color:LABEL_C,font:{size:10}}},
+        y:{grid:{display:false},ticks:{color:LABEL_C,font:{size:12,weight:'600'}}}
+      }
+    })
+  });
+  // draw value labels
+  const orig = charts['total'].draw.bind(charts['total']);
+  charts['total'].draw = function() {
+    orig();
+    const chart = charts['total'];
+    const ctx2 = chart.ctx;
+    chart.data.datasets[0].data.forEach((val, i) => {
+      const meta = chart.getDatasetMeta(0);
+      const bar = meta.data[i];
+      ctx2.fillStyle = '#e2e8f0';
+      ctx2.font = 'bold 13px Segoe UI, sans-serif';
+      ctx2.textAlign = 'left';
+      ctx2.fillText(val.toFixed(2) + ' pts', bar.x + 6, bar.y + 4);
+    });
+  };
+}
+
+// ── CHART: DIMS ──────────────────────────────────────
+function renderChartDims() {
+  destroyChart('dims');
+  const ctx = document.getElementById('chart-dims').getContext('2d');
+  const labels = DIMS.map(d => DIM_LABELS[d]);
+  charts['dims'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {label:'INTEC', data: DIMS.map(d => +DIM_T[d].i.toFixed(2)), backgroundColor: INTEC_C, borderRadius:4, borderSkipped:false},
+        {label:'EXPERTICE', data: DIMS.map(d => +DIM_T[d].e.toFixed(2)), backgroundColor: EXP_C, borderRadius:4, borderSkipped:false},
+      ]
+    },
+    options: baseOpts({
+      plugins:{...chartDefaults.plugins,
+        legend:{display:true,position:'bottom',labels:{color:'#94a3b8',font:{size:11},boxWidth:10,padding:12}},
+        tooltip:{...chartDefaults.plugins.tooltip,callbacks:{label: c => ` ${c.dataset.label}: ${c.raw} pts`}}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{color:LABEL_C,font:{size:11}}},
+        y:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:11}},
+          title:{display:true,text:'Puntaje ponderado',color:LABEL_C,font:{size:10}}}
+      }
+    })
+  });
+}
+
+// ── CHART: DRIVERS ───────────────────────────────────
+function renderChartDrivers() {
+  destroyChart('drivers');
+  const ctx = document.getElementById('chart-drivers').getContext('2d');
+  // Top 10 by abs diff, excluding empates
+  const sorted = [...DATA].filter(d => d.winner !== 'Empate').sort((a,b) => Math.abs(b.diff)-Math.abs(a.diff)).slice(0,10);
+  const labels = sorted.map(d => d.item.length > 38 ? d.item.slice(0,38)+'…' : d.item);
+  const vals   = sorted.map(d => +d.diff.toFixed(3));
+  const colors = sorted.map(d => d.winner==='INTEC' ? INTEC_C : EXP_C);
+
+  charts['drivers'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: vals,
+        backgroundColor: colors,
+        borderRadius: 4, borderSkipped: false,
+      }]
+    },
+    options: baseOpts({
+      indexAxis: 'y',
+      plugins:{...chartDefaults.plugins,
+        tooltip:{...chartDefaults.plugins.tooltip,callbacks:{
+          label: c => { const d=sorted[c.dataIndex]; return ` Δ ${c.raw>0?'+':''}${c.raw.toFixed(3)} — ${d.winner} lidera`; }
+        }}
+      },
+      scales:{
+        x:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:10}},
+          title:{display:true,text:'Diferencia de puntos ponderados',color:LABEL_C,font:{size:10}}},
+        y:{grid:{display:false},ticks:{color:LABEL_C,font:{size:10},maxRotation:0}}
+      }
+    })
+  });
+}
+
+// ── PONDERACIÓN VIZ (hierarchical bars) ──────────────
+function renderPondViz() {
+  const dimColors = {FUNCIONAL:'#f97316',TÉCNICO:'#a78bfa',PROVEEDOR:'#67e8f9',ECONOMICO:'#f59e0b'};
+  const cats = {};
+  DATA.forEach(d => {
+    const k = d.dim+'|||'+d.cat;
+    if (!cats[k]) cats[k] = {dim:d.dim,cat:d.cat,peso:0};
+    cats[k].peso += d.peso;
+  });
+
+  let html = '';
+  DIMS.forEach(dim => {
+    const dimPeso = DIM_WEIGHTS[dim];
+    const color = dimColors[dim];
+    const dimCats = Object.values(cats).filter(c => c.dim===dim);
+    const dimItems = DATA.filter(d => d.dim===dim);
+
+    html += `<div class="pl-dim" style="margin-bottom:12px">
+      <div class="pl-dim-name" style="color:${color};display:flex;align-items:center;gap:8px">
+        <span>${DIM_LABELS[dim]}</span>
+        <span style="font-size:10px;color:var(--text3);font-weight:400">${dimPeso}% del total</span>
+      </div>
+      <div style="background:var(--bg);height:8px;border-radius:4px;overflow:hidden;margin:4px 0 8px">
+        <div style="width:${dimPeso}%;height:100%;background:${color};border-radius:4px;opacity:.7"></div>
+      </div>`;
+
+    dimCats.forEach(cat => {
+      const catItems = dimItems.filter(d => d.cat===cat.cat);
+      const catPeso = +catItems.reduce((s,d)=>s+d.peso,0).toFixed(2);
+      html += `<div style="margin-bottom:8px;padding-left:12px;border-left:2px solid ${color}30">
+        <div style="font-size:11px;color:var(--text2);font-weight:600;margin-bottom:5px">${cat.cat} — ${catPeso.toFixed(1)}%</div>`;
+      catItems.forEach(item => {
+        const pct = (item.peso / dimPeso) * 100;
+        html += `<div class="pl-item-row">
+          <div class="pl-item-name" title="${item.item}">${item.item.length>38?item.item.slice(0,38)+'…':item.item}</div>
+          <div class="pl-bar-wrap"><div class="pl-bar-fill" style="width:${Math.min(pct,100)}%;background:${color};opacity:.65"></div></div>
+          <div class="pl-item-pct">${item.peso.toFixed(2)}%</div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('pond-viz').innerHTML = html;
+}
+
+// ── S2 FILTER LOGIC ──────────────────────────────────
+let sortKey = 'peso';
+
+function getFiltered() {
+  const dim = document.getElementById('fd').value;
+  const cat = document.getElementById('fc').value;
+  const win = document.getElementById('fw').value;
+  const q   = document.getElementById('fs').value.toLowerCase().trim();
+  return DATA.filter(d => {
+    if (dim && d.dim !== dim) return false;
+    if (cat && d.cat !== cat) return false;
+    if (win && d.winner !== win) return false;
+    if (q && !d.item.toLowerCase().includes(q) && !d.cat.toLowerCase().includes(q) && !d.dim.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+
+function populateCats() {
+  const dim = document.getElementById('fd').value;
+  const cats = [...new Set(DATA.filter(d => !dim || d.dim===dim).map(d => d.cat))];
+  const sel = document.getElementById('fc');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">Todas</option>';
+  cats.forEach(c => { const o = document.createElement('option'); o.value=c; o.textContent=c; if(c===prev) o.selected=true; sel.appendChild(o); });
+}
+
+function onDimChange() { populateCats(); renderS2(); }
+
+function setSort(key, el) {
+  sortKey = key;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderS2();
+}
+
+let s2ItemChart = null, s2TotalChart = null;
+
+function renderS2() {
+  let data = getFiltered();
+  data.sort((a,b) => {
+    if (sortKey==='peso')  return b.peso - a.peso;
+    if (sortKey==='diff')  return Math.abs(b.diff) - Math.abs(a.diff);
+    if (sortKey==='intec') return b.i_final - a.i_final;
+    if (sortKey==='exp')   return b.e_final - a.e_final;
+    return 0;
+  });
+
+  document.getElementById('tcount').textContent = `${data.length} de ${DATA.length} ítems`;
+
+  // Table
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td style="max-width:220px;line-height:1.4">${d.item}</td>
+      <td><span class="dim-tag ${d.dim}">${DIM_LABELS[d.dim]||d.dim}</span></td>
+      <td style="font-size:11px;color:var(--text3);max-width:140px">${d.cat}</td>
+      <td><strong style="color:#fff">${d.peso.toFixed(2)}%</strong></td>
+      <td style="text-align:center">${ptsChip(d.i_pts)}</td>
+      <td style="text-align:center;font-weight:600;color:var(--intec);font-size:13px">${d.i_final.toFixed(2)}</td>
+      <td style="text-align:center">${ptsChip(d.e_pts)}</td>
+      <td style="text-align:center;font-weight:600;color:var(--exp);font-size:13px">${d.e_final.toFixed(2)}</td>
+      <td style="text-align:center">${diffFmt(d.diff)}</td>
+      <td>${winnerBadge(d.winner)}</td>
+    </tr>`).join('');
+
+  // Mini total chart
+  const ti = +data.reduce((s,d)=>s+d.i_final,0).toFixed(2);
+  const te = +data.reduce((s,d)=>s+d.e_final,0).toFixed(2);
+  const diff = +(ti-te).toFixed(2);
+  const diffStr = diff>0?`+${diff.toFixed(2)}`:diff<0?`${diff.toFixed(2)}`:'=';
+  const diffColor = diff>0?'var(--intec)':diff<0?'var(--exp)':'var(--tie)';
+  document.getElementById('s2-diff-label').innerHTML =
+    `<div style="color:${diffColor}">${diffStr}</div>
+     <div style="font-size:11px;font-weight:400;color:var(--text3);margin-top:2px">${data.length} ítem${data.length!==1?'s':''} · ${diff>0?'INTEC lidera':diff<0?'EXP lidera':'Empate'}</div>`;
+
+  if (s2TotalChart) s2TotalChart.destroy();
+  const ctx1 = document.getElementById('chart-s2-total').getContext('2d');
+  s2TotalChart = new Chart(ctx1, {
+    type:'bar',
+    data:{labels:['INTEC','EXPERTICE'],datasets:[{data:[ti,te],backgroundColor:[INTEC_C,EXP_C],borderRadius:5,borderSkipped:false}]},
+    options: baseOpts({
+      indexAxis:'y',
+      plugins:{...chartDefaults.plugins,tooltip:{...chartDefaults.plugins.tooltip,callbacks:{label:c=>` ${c.raw} pts`}}},
+      scales:{
+        x:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:11}},min:0},
+        y:{grid:{display:false},ticks:{color:LABEL_C,font:{size:12,weight:'600'}}}
+      }
+    })
+  });
+
+  // Per-item chart — show ALL filtered items, not capped at 12
+  if (s2ItemChart) s2ItemChart.destroy();
+  // Dynamically size chart height based on number of items
+  const itemH = Math.max(460, data.length * 38);
+  document.querySelector('#chart-s2-items').parentElement.style.height = itemH + 'px';
+
+  const ctx2 = document.getElementById('chart-s2-items').getContext('2d');
+  s2ItemChart = new Chart(ctx2, {
+    type:'bar',
+    data:{
+      labels: data.map(d => d.item.length>40?d.item.slice(0,40)+'…':d.item),
+      datasets:[
+        {label:'INTEC',    data:data.map(d=>+d.i_final.toFixed(3)), backgroundColor:INTEC_C+'dd', borderRadius:4, borderSkipped:false},
+        {label:'EXPERTICE',data:data.map(d=>+d.e_final.toFixed(3)), backgroundColor:EXP_C+'dd',   borderRadius:4, borderSkipped:false},
+      ]
+    },
+    options: baseOpts({
+      indexAxis:'y',
+      plugins:{...chartDefaults.plugins,
+        legend:{display:true,position:'bottom',labels:{color:'#94a3b8',font:{size:12},boxWidth:10,padding:14}},
+        tooltip:{...chartDefaults.plugins.tooltip,callbacks:{label:c=>` ${c.dataset.label}: ${c.raw} pts`}}
+      },
+      scales:{
+        x:{grid:{color:AXIS_C},ticks:{color:LABEL_C,font:{size:11}},
+           title:{display:true,text:'Puntaje ponderado final',color:LABEL_C,font:{size:11}}},
+        y:{grid:{display:false},ticks:{color:LABEL_C,font:{size:12},maxRotation:0}}
+      }
+    })
+  });
+}
+</script>
+</body>
+</html>
